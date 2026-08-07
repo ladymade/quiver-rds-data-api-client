@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "lism-css": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@lism-css/mcp"]
+    }
+  }
+}
