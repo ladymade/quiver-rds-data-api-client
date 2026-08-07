@@ -11,11 +11,7 @@
 
   "customizations": {
     "vscode": {
-      "extensions": [
-        "GitHub.copilot",
-        "GitHub.copilot-chat",
-        "biomejs.biome"
-      ],
+      "extensions": ["GitHub.copilot", "GitHub.copilot-chat", "biomejs.biome"],
       "settings": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "biomejs.biome"
