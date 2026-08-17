@@ -1,59 +1,73 @@
 # Quiver
 
-Quiver は、Amazon RDS Data API を使用して Aurora MySQL / PostgreSQL を操作するデスクトップ DB クライアントです。
+Quiver is a desktop database client for Amazon Aurora databases that uses the AWS RDS Data API instead of opening a direct TCP connection.
 
-通常の DB クライアントと異なり、RDS へ直接 TCP 接続を行わず、AWS SDK 経由の RDS Data API を通じて接続・クエリ実行・テーブル確認を行います。
+It is designed for teams and developers who want a lightweight desktop tool to:
 
-## 現在の実装状況
+- browse AWS credential profiles
+- discover Aurora clusters and databases
+- validate a connection before executing SQL
+- inspect schemas and table metadata
+- run SQL queries through the RDS Data API
+- manage saved connection profiles locally
 
-Quiver は現在、以下の主要機能を実装済みです。
+This project is intentionally opinionated: it does not connect directly to the database over the network. All access goes through AWS SDK calls and the RDS Data API layer.
 
-- AWS 認証プロファイルの読み込み
-- AWS credentials ディレクトリの切り替え
-- RDS Aurora クラスタ一覧の取得
-- 接続テスト（SELECT 1 の実行）
-- 接続プロファイルの作成・更新・削除
-- テーブル一覧とカラム一覧の取得
-- SQL 実行と結果表示
-- デスクトップ UI 上でのプロファイル切り替えと画面遷移
+## Why Quiver?
 
-## 主要画面
+Most database GUI tools assume a direct DB socket is available. In AWS environments, that is often not possible or desirable.
+
+Quiver is built for the AWS-native workflow:
+
+- use AWS credentials or named profiles
+- target Aurora MySQL or PostgreSQL clusters
+- execute SQL via RDS Data API
+- keep secrets out of the renderer process
+- work from a desktop client without exposing DB credentials to the browser layer
+
+## Features
+
+- AWS profile discovery and selection
+- AWS credentials directory switching
+- Aurora cluster listing
+- connection validation
+- saved connection profile create / update / delete
+- table and column metadata inspection
+- query execution and result rendering
+- desktop UI for profile switching and query editing
+
+## Screens
 
 - Create Profile
 - Edit Profile
 - Query Editor
 
-画面ごとの詳細仕様は以下のドキュメントを参照してください。
+For implementation details and UI specs, see:
 
 - [docs/CREATE_PROFILE_SCREEN.md](docs/CREATE_PROFILE_SCREEN.md)
 - [docs/EDIT_PROFILE_SCREEN.md](docs/EDIT_PROFILE_SCREEN.md)
 - [docs/QUERY_EDITOR_SCREEN.md](docs/QUERY_EDITOR_SCREEN.md)
 
-## 技術スタック
+## How it works
+
+Quiver follows a clean layered architecture:
+
+- Main process: AWS SDK calls, IPC handlers, local persistence
+- Preload: safe bridge for renderer access
+- Renderer: React-based desktop UI only
+- Shared: typed IPC contracts between main and renderer
+
+## Tech stack
 
 - Electron
 - React + TypeScript
 - Vite
-- Tailwind CSS + shadcn/ui 風の UI コンポーネント
+- Tailwind CSS
 - AWS SDK v3
 - Biome
 - Docker Compose / MiniStack
 
-## アーキテクチャ
-
-- Main Process
-  - AWS SDK 呼び出し
-  - local storage / userData への保存
-  - IPC ハンドラの登録
-- Preload
-  - contextBridge を経由して Renderer に安全な API を公開
-- Renderer Process
-  - ユーザー操作 UI
-  - DB 接続プロファイルの作成・編集・クエリ編集
-- Shared
-  - Main / Renderer 間で共有する IPC 型定義
-
-## ディレクトリ構成
+## Project structure
 
 ```text
 quiver/
@@ -75,30 +89,52 @@ quiver/
 │   └── QUERY_EDITOR_SCREEN.md
 ├── docker/
 ├── scripts/
-├── release/
+├── build/
+├── e2e/
 ├── package.json
+├── electron-builder.yml
 ├── tsconfig.json
 ├── vite.config.ts
 ├── biome.json
-└── README.md
+├── LICENSE
+├── README.md
+└── .gitignore
 ```
 
-## セットアップ
+## Requirements
 
-1. Node.js LTS を用意
-2. 依存関係をインストール
+- Node.js 20 LTS or later
+- npm
+- AWS account with access to Aurora and RDS Data API
+- valid AWS credentials or named profiles
+
+## Getting started
+
+### 1) Install dependencies
 
 ```bash
 npm install
 ```
 
-3. 開発起動
+### 2) Start the app in development mode
 
 ```bash
 npm run dev
 ```
 
-## 利用可能なコマンド
+### 3) Build the app
+
+```bash
+npm run build
+```
+
+### 4) Run lint checks
+
+```bash
+npm run lint
+```
+
+## Useful commands
 
 ```bash
 npm run dev
@@ -115,46 +151,74 @@ npm run ministack:logs
 npm run ministack:reset
 ```
 
-## MiniStack を使う
+## Local testing with MiniStack
 
-ローカル開発では RDS Data API の代替として MiniStack を利用できます。
+For local development and validation, the project supports MiniStack as a substitute for AWS RDS Data API endpoints.
 
 ```bash
 npm run ministack:up
 npm run ministack:init
 ```
 
-プロファイル名が `ministack` の場合、RDSClient / RDSDataClient はローカルエンドポイントを利用する実装になっています。
+When the profile name is `ministack`, the app will use the local MiniStack endpoint instead of the AWS production endpoint.
 
-## Windows 向けパッケージ生成
+## Packaging installers
 
-Linux から Windows 向けのインストーラーを作成するには、以下の手順を実行します。
+### Linux/macOS/Windows targets
+
+The app can be packaged with Electron Builder:
 
 ```bash
-npm install
+npm run build
+npm run package
+```
+
+For Windows-specific packaging:
+
+```bash
 npm run build
 npm run check:win-env
 npm run package:win
 ```
 
-生成物は `release` 配下に出力されます。
+Outputs are generated under the `release` directory.
 
-## 重要な設計上の制約
+## Important constraints
 
-- 直接 DB 接続は行わない
-- AWS 認証情報やシークレット情報は Renderer に露出しない
-- AWS SDK の利用は infrastructure 層に閉じ込める
-- IPC は Typed API を介して Main / Renderer 間で安全にやり取りする
-- 画面はデスクトップ前提で設計する
+- no direct database TCP connection is used
+- AWS credentials and secrets are never exposed to the renderer process
+- AWS SDK usage is isolated to the infrastructure layer
+- IPC is typed and kept explicit between main and renderer
+- the app is designed for desktop use, not browser-only operation
 
-## 今後の予定
+## Roadmap
 
-- クエリ履歴の保存と再実行
-- テーブル/カラムのより高度な表示
-- 接続失敗時のガイダンス改善
-- AWS SSO / profile 連携の強化
-- エラー監視ログの改善と可視化
+Planned improvements include:
 
-## ライセンス
+- query history and re-execution
+- richer schema visualization
+- better error guidance for failed connections
+- stronger AWS profile / SSO support
+- improved logging and troubleshooting tools
 
-MIT
+## Contributing
+
+Contributions are welcome.
+
+Before submitting changes:
+
+- open or update an issue for significant work
+- keep the project architecture consistent with the clean-layer design
+- keep AWS/RDS logic inside the infrastructure layer
+- prefer small, reviewable pull requests
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+## Related docs
+
+- [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)
+- [docs/CREATE_PROFILE_SCREEN.md](docs/CREATE_PROFILE_SCREEN.md)
+- [docs/EDIT_PROFILE_SCREEN.md](docs/EDIT_PROFILE_SCREEN.md)
+- [docs/QUERY_EDITOR_SCREEN.md](docs/QUERY_EDITOR_SCREEN.md)
