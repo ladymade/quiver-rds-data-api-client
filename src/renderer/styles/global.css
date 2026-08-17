@@ -1,0 +1,159 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 188 50% 97%;
+    --foreground: 188 17% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 188 17% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 188 17% 10%;
+    --primary: 187 100% 23%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 279 93% 43%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 195 24% 91%;
+    --muted-foreground: 193 12% 40%;
+    --accent: 195 24% 91%;
+    --accent-foreground: 188 17% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 191 20% 80%;
+    --input: 191 20% 80%;
+    --ring: 187 100% 45%;
+    --radius: 0.5rem;
+    --app-sidebar-width: 80px;
+    --app-topbar-height: 4rem;
+    --app-query-sidebar-width: 18rem;
+    --sidebar-bg: 230 50% 9%;
+    --sidebar-on: 233 100% 94%;
+    --surface-neutral: 210 40% 98%;
+    --border-subtle: 214 32% 91%;
+    --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+    --font-code: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    min-width: 960px;
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    margin: 0;
+    font-family: var(--font-body);
+    background-image: none;
+  }
+
+  input[type="text"],
+  select {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input[type="text"]:focus,
+  select:focus {
+    border-color: #00daf3;
+    box-shadow: 0 0 0 1px #00daf3;
+    outline: none;
+  }
+}
+
+@layer utilities {
+  .stitch-headline-lg {
+    font-family: var(--font-body);
+    font-size: 24px;
+    line-height: 32px;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  .stitch-headline-md {
+    font-family: var(--font-body);
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+  }
+
+  .stitch-body-md {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+
+  .stitch-body-sm {
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 400;
+  }
+
+  .stitch-label-md {
+    font-family: var(--font-body);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .stitch-code-md {
+    font-family: var(--font-code);
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 400;
+  }
+
+  .stitch-radio {
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    border: 1px solid #bac9cc;
+    background: #ffffff;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  }
+
+  .stitch-radio:checked {
+    border-color: #00daf3;
+    background: radial-gradient(circle at center, #00daf3 0 42%, transparent 43%), #ffffff;
+    box-shadow: 0 0 0 1px #00daf3;
+  }
+
+  .stitch-radio:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 1px #00daf3, 0 0 0 4px rgb(0 218 243 / 16%);
+  }
+
+  .stitch-loading-bar {
+    background: linear-gradient(90deg, #00daf3, #aa39ed);
+    animation: stitch-loading-indeterminate 1.5s linear infinite;
+    transform-origin: 0% 50%;
+  }
+}
+
+@keyframes stitch-loading-indeterminate {
+  0% {
+    transform: translateX(0) scaleX(0);
+  }
+
+  40% {
+    transform: translateX(0) scaleX(0.4);
+  }
+
+  100% {
+    transform: translateX(100%) scaleX(0.5);
+  }
+}

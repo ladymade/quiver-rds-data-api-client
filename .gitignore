@@ -1,0 +1,36 @@
+.vscode/*
+!.vscode/.gitkeep
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+release/
+out/
+.biome/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test artifacts
+playwright-report/
+test-results/
+
+# Local AI/design workspaces
+.agents/
+.stitch/

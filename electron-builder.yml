@@ -1,0 +1,50 @@
+appId: com.quiver.app
+productName: Quiver
+copyright: Copyright © 2024 Quiver
+
+directories:
+  output: release
+
+files:
+  - dist/**/*
+  - node_modules/**/*
+  - package.json
+
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+
+mac:
+  icon: build/icon.icns
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  category: public.app-category.developer-tools
+
+linux:
+  icon: build/icons
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  category: Development
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
