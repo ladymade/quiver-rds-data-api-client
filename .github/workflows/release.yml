@@ -77,7 +77,12 @@ jobs:
       - name: Prepare release assets
         run: |
           mkdir -p release-assets
-          find release-artifacts -type f \( -iname '*.exe' -o -iname '*.dmg' -o -iname '*.AppImage' -o -iname '*.zip' -o -iname '*.yml' -o -iname '*.blockmap' \) -exec cp {} release-assets/ \;
+          find release-artifacts -type f \( -iname '*.exe' -o -iname '*.dmg' -o -iname '*.AppImage' -o -iname '*.zip' -o -iname '*.yml' -o -iname '*.blockmap' \) \
+            ! -iname 'Quiver.exe' \
+            ! -iname 'elevate.exe' \
+            ! -iname 'builder-debug.yml' \
+            ! -iname 'app-update.yml' \
+            -exec cp {} release-assets/ \;
           ls -la release-assets
 
       - name: Create GitHub Release
