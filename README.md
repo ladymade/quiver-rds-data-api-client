@@ -116,6 +116,16 @@ quiver/
 - AWS account with access to Aurora and RDS Data API
 - valid AWS credentials or named AWS profiles
 
+## Installation
+
+Download the latest installer from the [GitHub Releases](https://github.com/ladymade/quiver-rds-data-api-client/releases) page.
+
+- Windows: download the `.exe` installer
+- macOS: download the `.dmg` installer
+- Linux: download the `.AppImage` and make it executable before launching
+
+The v0.1.0 release is an early release. Installers are currently unsigned, and automatic updates are not included. Your operating system may show a security warning when launching an installer; verify the download source before continuing.
+
 ## Getting started
 
 ### 1) Install dependencies

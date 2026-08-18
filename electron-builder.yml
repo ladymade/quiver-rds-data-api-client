@@ -28,6 +28,7 @@ mac:
 
 linux:
   icon: build/icon.png
+  syncDesktopName: true
   target:
     - target: AppImage
       arch:
