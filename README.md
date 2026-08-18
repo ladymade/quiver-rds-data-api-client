@@ -232,6 +232,9 @@ Planned improvements include:
 
 Contributions are welcome.
 
+Changes to `main` are managed through pull requests. Direct pushes to `main` are
+not part of the intended OSS workflow once branch protection is enabled.
+
 Before submitting changes:
 
 - open or update an issue for significant work
