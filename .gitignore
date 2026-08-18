@@ -34,3 +34,8 @@ test-results/
 # Local AI/design workspaces
 .agents/
 .stitch/
+
+# Local AI agent instructions and skill configuration
+AGENTS.md
+skills-lock.json
+.github/copilot-instructions.md
