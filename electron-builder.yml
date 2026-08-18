@@ -27,7 +27,7 @@ mac:
   category: public.app-category.developer-tools
 
 linux:
-  icon: build/icons
+  icon: build/icon.png
   target:
     - target: AppImage
       arch:
