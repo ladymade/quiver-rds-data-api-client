@@ -1,40 +1,44 @@
 # Quiver
 
-Quiver is a desktop database client for Amazon Aurora databases that uses the AWS RDS Data API instead of opening a direct TCP connection.
+A faster way to work with Aurora databases without repeated login friction, SSH hopping, or direct DB exposure.
 
-It is designed for teams and developers who want a lightweight desktop tool to:
+Quiver is a desktop database client for Amazon Aurora built around the AWS RDS Data API. It helps you connect to Aurora MySQL and PostgreSQL through AWS-native authentication and keep your database access simple, repeatable, and safer.
 
-- browse AWS credential profiles
-- discover Aurora clusters and databases
-- validate a connection before executing SQL
-- inspect schemas and table metadata
-- run SQL queries through the RDS Data API
-- manage saved connection profiles locally
+## Why this project exists
 
-This project is intentionally opinionated: it does not connect directly to the database over the network. All access goes through AWS SDK calls and the RDS Data API layer.
+If you work with AWS-hosted databases, the usual flow is painful:
 
-## Why Quiver?
+- you keep switching between AWS profiles and regions
+- you waste time re-entering credentials or cluster details
+- you rely on browser-based tooling or ad-hoc scripts
+- you need to manage direct database access in environments where that is not ideal or even allowed
 
-Most database GUI tools assume a direct DB socket is available. In AWS environments, that is often not possible or desirable.
+Quiver reduces that friction.
 
-Quiver is built for the AWS-native workflow:
+With Quiver, you can:
 
-- use AWS credentials or named profiles
-- target Aurora MySQL or PostgreSQL clusters
-- execute SQL via RDS Data API
-- keep secrets out of the renderer process
-- work from a desktop client without exposing DB credentials to the browser layer
+- open a saved profile and get straight to work
+- avoid repeated login and credential entry across sessions
+- connect to Aurora through AWS-native APIs instead of opening direct DB sockets
+- keep secrets out of browser-layer code and UI state
+- work in a focused desktop workflow built for database tasks
 
-## Features
+## What Quiver solves
+
+- no repeated manual login flow for every session
+- no need to expose a direct database endpoint in your daily workflow
+- reduced operational overhead when using AWS profiles and Aurora clusters
+- a consistent desktop workflow for connection setup, schema inspection, and query execution
+
+## Core features
 
 - AWS profile discovery and selection
-- AWS credentials directory switching
-- Aurora cluster listing
-- connection validation
+- AWS credentials directory support
+- Aurora cluster lookup and connection testing
 - saved connection profile create / update / delete
 - table and column metadata inspection
-- query execution and result rendering
-- desktop UI for profile switching and query editing
+- SQL execution via the RDS Data API
+- desktop-based profile switching and query workflow
 
 ## Screens
 
@@ -50,12 +54,14 @@ For implementation details and UI specs, see:
 
 ## How it works
 
-Quiver follows a clean layered architecture:
+Quiver uses the AWS SDK and RDS Data API instead of opening a raw database connection. It is designed for cataloging AWS-safe database access in a desktop workflow while keeping the app logic cleanly separated.
 
-- Main process: AWS SDK calls, IPC handlers, local persistence
-- Preload: safe bridge for renderer access
+The app structure is intentionally layered:
+
+- Main process: AWS SDK calls, local persistence, IPC handlers
+- Preload: safe bridge to the renderer process
 - Renderer: React-based desktop UI only
-- Shared: typed IPC contracts between main and renderer
+- Shared: typed IPC contracts between processes
 
 ## Tech stack
 
@@ -98,6 +104,8 @@ quiver/
 ├── biome.json
 ├── LICENSE
 ├── README.md
+├── CONTRIBUTING.md
+├── SECURITY.md
 └── .gitignore
 ```
 
@@ -106,7 +114,7 @@ quiver/
 - Node.js 20 LTS or later
 - npm
 - AWS account with access to Aurora and RDS Data API
-- valid AWS credentials or named profiles
+- valid AWS credentials or named AWS profiles
 
 ## Getting started
 
@@ -122,7 +130,7 @@ npm install
 npm run dev
 ```
 
-### 3) Build the app
+### 3) Build the project
 
 ```bash
 npm run build
@@ -143,6 +151,8 @@ npm run lint
 npm run lint:fix
 npm run format
 npm run package
+npm run package:linux
+npm run package:mac
 npm run package:win
 npm run ministack:up
 npm run ministack:init
@@ -164,20 +174,18 @@ When the profile name is `ministack`, the app will use the local MiniStack endpo
 
 ## Packaging installers
 
-### Linux/macOS/Windows targets
-
-The app can be packaged with Electron Builder:
+The project is configured for Electron Builder packaging:
 
 ```bash
 npm run build
 npm run package
 ```
 
-For Windows-specific packaging:
+Platform-specific packaging:
 
 ```bash
-npm run build
-npm run check:win-env
+npm run package:linux
+npm run package:mac
 npm run package:win
 ```
 
@@ -190,6 +198,15 @@ Outputs are generated under the `release` directory.
 - AWS SDK usage is isolated to the infrastructure layer
 - IPC is typed and kept explicit between main and renderer
 - the app is designed for desktop use, not browser-only operation
+
+## Why this is useful for daily AWS work
+
+This app is meant to reduce repetitive AWS database work:
+
+- reuse a saved connection profile instead of re-entering cluster information every time
+- stop constantly switching between AWS tools and ad hoc SQL shells
+- keep AWS authentication centralized and profile-based
+- make quick Aurora checks part of a normal developer workflow
 
 ## Roadmap
 
@@ -211,6 +228,12 @@ Before submitting changes:
 - keep the project architecture consistent with the clean-layer design
 - keep AWS/RDS logic inside the infrastructure layer
 - prefer small, reviewable pull requests
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance.
+
+## Security
+
+Please do not commit credentials or secrets. For vulnerability reporting, see [SECURITY.md](SECURITY.md).
 
 ## License
 
