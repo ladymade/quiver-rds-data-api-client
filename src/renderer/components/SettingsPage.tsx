@@ -56,12 +56,10 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
 
   return (
     <section className="flex h-full flex-col" aria-labelledby="settings-page-title">
-      <header className="flex h-20 w-full shrink-0 items-center justify-between border-b border-[#E2E8F0] bg-white px-8">
-        <h1 className="text-2xl font-semibold leading-8 text-[#151d1e]" id="settings-page-title">
-          Settings
-        </h1>
+      <header className="sticky top-0 z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-[#E2E8F0] bg-white px-8">
+        <div className="flex items-center gap-4" />
         <button
-          className="flex items-center gap-2 rounded-lg bg-[#006875] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#006875]/90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded bg-[#006875] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#004f58] disabled:cursor-not-allowed disabled:opacity-60"
           disabled={isSaving}
           onClick={() => {
             void handleSave();
@@ -74,6 +72,15 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
 
       <div className="flex-grow overflow-y-auto p-8">
         <div className="mx-auto max-w-3xl">
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold text-[#151d1e]" id="settings-page-title">
+              Settings
+            </h2>
+            <p className="mt-1 text-sm text-[#3b494c]">
+              Manage your application preferences and configuration.
+            </p>
+          </div>
+
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
             <h2 className="mb-6 border-b border-[#E2E8F0] pb-4 text-lg font-semibold text-[#151d1e]">
               General Settings
