@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { ConnectionProfileDto } from "../shared/types/ipc";
 import { AppSidebar } from "./components/AppSidebar";
 import { AppTopbar } from "./components/AppTopbar";
@@ -9,13 +10,15 @@ import { InfoPage } from "./components/InfoPage";
 import { LoadingOverlayProvider } from "./components/LoadingOverlayProvider";
 import { NewProfileForm, type NewProfileFormValues } from "./components/NewProfileForm";
 import { QueryEditorPage } from "./components/QueryEditorPage";
+import { SettingsPage } from "./components/SettingsPage";
 import { useErrorDialog } from "./hooks/useErrorDialog";
 import { useLoadingOverlay } from "./hooks/useLoadingOverlay";
 import { useUnexpectedErrorHandler } from "./hooks/useUnexpectedErrorHandler";
 
-type AppView = "newProfile" | "queryEditor" | "editProfile" | "info";
+type AppView = "newProfile" | "queryEditor" | "editProfile" | "info" | "settings";
 
 function AppContent(): React.JSX.Element {
+  const { t } = useTranslation();
   const { showErrorDialog } = useErrorDialog();
   const { beginLoading } = useLoadingOverlay();
   const { showUnexpectedError } = useUnexpectedErrorHandler();
@@ -69,7 +72,7 @@ function AppContent(): React.JSX.Element {
       return false;
     }
 
-    const stopLoading = beginLoading("Loading profiles...");
+    const stopLoading = beginLoading(t("profile.loadingProfiles"));
 
     try {
       const result = await window.quiverApi.listConnectionProfiles();
@@ -77,9 +80,9 @@ function AppContent(): React.JSX.Element {
 
       if (!foundProfile) {
         showErrorDialog(
-          "Failed to open Query Editor",
-          "The created profile could not be found.",
-          "Please recreate the profile and try again."
+          t("profile.failedToOpenEditor"),
+          t("profile.createdProfileMissing"),
+          t("profile.recreateProfile")
         );
         setCurrentView("newProfile");
         return false;
@@ -102,7 +105,7 @@ function AppContent(): React.JSX.Element {
       return;
     }
 
-    const stopLoading = beginLoading("Refreshing profiles...");
+    const stopLoading = beginLoading(t("profile.refreshingProfiles"));
 
     try {
       const result = await window.quiverApi.listConnectionProfiles();
@@ -130,7 +133,7 @@ function AppContent(): React.JSX.Element {
       return;
     }
 
-    const stopLoading = beginLoading("Loading profiles...");
+    const stopLoading = beginLoading(t("profile.loadingProfiles"));
 
     void window.quiverApi
       .listConnectionProfiles()
@@ -156,7 +159,7 @@ function AppContent(): React.JSX.Element {
       .finally(() => {
         stopLoading();
       });
-  }, [beginLoading, showUnexpectedError]);
+  }, [beginLoading, showUnexpectedError, t]);
 
   useEffect(() => {
     const handleWindowError = (event: ErrorEvent): void => {
@@ -184,7 +187,7 @@ function AppContent(): React.JSX.Element {
     setIsCreatingProfile(true);
     setCreateProfileMessage(null);
     setCreateProfileSuccess(null);
-    const stopLoading = beginLoading("Creating profile...");
+    const stopLoading = beginLoading(t("profile.creatingOverlay"));
 
     try {
       const result = await window.quiverApi.createConnectionProfile({
@@ -200,7 +203,7 @@ function AppContent(): React.JSX.Element {
 
       setCreateProfileSuccess(result.success);
       setCreateProfileMessage(
-        result.success ? null : (result.errorMessage ?? "Failed to create profile.")
+        result.success ? null : (result.errorMessage ?? t("profile.failedToCreate"))
       );
 
       if (result.success) {
@@ -227,7 +230,7 @@ function AppContent(): React.JSX.Element {
     setIsCreatingProfile(true);
     setCreateProfileMessage(null);
     setCreateProfileSuccess(null);
-    const stopLoading = beginLoading("Saving profile...");
+    const stopLoading = beginLoading(t("profile.savingOverlay"));
 
     try {
       const result = await window.quiverApi.updateConnectionProfile({
@@ -246,7 +249,7 @@ function AppContent(): React.JSX.Element {
 
       setCreateProfileSuccess(result.success);
       setCreateProfileMessage(
-        result.success ? null : (result.errorMessage ?? "Failed to update profile.")
+        result.success ? null : (result.errorMessage ?? t("profile.failedToUpdate"))
       );
 
       if (result.success) {
@@ -273,14 +276,14 @@ function AppContent(): React.JSX.Element {
     setIsCreatingProfile(true);
     setCreateProfileMessage(null);
     setCreateProfileSuccess(null);
-    const stopLoading = beginLoading("Deleting profile...");
+    const stopLoading = beginLoading(t("profile.deletingOverlay"));
 
     try {
       const result = await window.quiverApi.deleteConnectionProfile(editingProfile.name);
 
       setCreateProfileSuccess(result.success);
       setCreateProfileMessage(
-        result.success ? null : (result.errorMessage ?? "Failed to delete profile.")
+        result.success ? null : (result.errorMessage ?? t("profile.failedToDelete"))
       );
 
       if (result.success) {
@@ -308,7 +311,7 @@ function AppContent(): React.JSX.Element {
     setIsTestingConnection(true);
     setTestConnectionMessage(null);
     setTestConnectionSuccess(null);
-    const stopLoading = beginLoading("Testing connection...");
+    const stopLoading = beginLoading(t("profile.testingOverlay"));
 
     try {
       const result = await window.quiverApi.testConnection({
@@ -326,7 +329,7 @@ function AppContent(): React.JSX.Element {
         setTestConnectionMessage(result.message);
       } else {
         setTestConnectionMessage(null);
-        showErrorDialog("Execution Error", result.message, result.details);
+        showErrorDialog(t("common.executionError"), result.message, result.details);
       }
     } catch (error) {
       setTestConnectionSuccess(false);
@@ -344,11 +347,15 @@ function AppContent(): React.JSX.Element {
         isInfoActive={currentView === "info"}
         isQueryEditorActive={currentView === "queryEditor" || currentView === "editProfile"}
         isNewProfileActive={currentView === "newProfile"}
+        isSettingsActive={currentView === "settings"}
         onInfoClick={() => {
           setCurrentView("info");
         }}
         onQueryEditorClick={() => {
           setCurrentView("queryEditor");
+        }}
+        onSettingsClick={() => {
+          setCurrentView("settings");
         }}
         onNewProfileClick={() => {
           setEditingProfileName(null);
@@ -368,15 +375,19 @@ function AppContent(): React.JSX.Element {
       <main className="ml-20 min-w-0 flex-1 bg-[#f3fbfc]">
         {currentView === "newProfile" || currentView === "editProfile" ? (
           <AppTopbar
-            pageTitle={currentView === "newProfile" ? "New Profile" : "Edit Profile"}
+            pageTitle={currentView === "newProfile" ? t("profile.new") : t("profile.edit")}
             showProfileActions={currentView === "newProfile" || currentView === "editProfile"}
             canPrimaryAction={canCreateProfile}
             canTestConnection={canTestConnection}
             primaryActionMessage={createProfileMessage}
             primaryActionSuccess={createProfileSuccess}
             isPrimaryActionLoading={isCreatingProfile}
-            primaryActionLabel={currentView === "newProfile" ? "Create Profile" : "Save Profile"}
-            primaryActionLoadingLabel={currentView === "newProfile" ? "Creating..." : "Saving..."}
+            primaryActionLabel={
+              currentView === "newProfile" ? t("profile.create") : t("profile.save")
+            }
+            primaryActionLoadingLabel={
+              currentView === "newProfile" ? t("profile.creating") : t("profile.saving")
+            }
             isTestingConnection={isTestingConnection}
             showDeleteAction={currentView === "editProfile"}
             isDeleteActionLoading={isCreatingProfile}
@@ -404,6 +415,8 @@ function AppContent(): React.JSX.Element {
         ) : null}
         {currentView === "info" ? (
           <InfoPage />
+        ) : currentView === "settings" ? (
+          <SettingsPage />
         ) : currentView === "newProfile" ? (
           <section
             className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-8 py-8"
@@ -411,11 +424,9 @@ function AppContent(): React.JSX.Element {
           >
             <div className="space-y-1">
               <h2 className="stitch-headline-lg text-slate-900" id="page-title">
-                Create Profile
+                {t("profile.create")}
               </h2>
-              <p className="stitch-body-md text-slate-600">
-                Configure connection details for your new database profile.
-              </p>
+              <p className="stitch-body-md text-slate-600">{t("profile.createDescription")}</p>
             </div>
             <NewProfileForm onChange={setFormValues} />
           </section>
@@ -426,11 +437,9 @@ function AppContent(): React.JSX.Element {
           >
             <div className="space-y-1">
               <h2 className="stitch-headline-lg text-slate-900" id="page-title">
-                Edit Profile
+                {t("profile.edit")}
               </h2>
-              <p className="stitch-body-md text-slate-600">
-                Edit the database authentication profile for RDS Data API connections.
-              </p>
+              <p className="stitch-body-md text-slate-600">{t("profile.editDescription")}</p>
             </div>
             <NewProfileForm
               initialValues={
@@ -482,9 +491,9 @@ function AppContent(): React.JSX.Element {
       </main>
       <ConfirmDialog
         open={isDeleteConfirmOpen}
-        title="Delete Profile"
-        message="This will permanently delete the current profile. This action cannot be undone."
-        confirmLabel="Delete"
+        title={t("profile.delete")}
+        message={t("profile.deleteConfirmation")}
+        confirmLabel={t("common.delete")}
         isConfirming={isCreatingProfile}
         onCancel={() => setIsDeleteConfirmOpen(false)}
         onConfirm={() => {

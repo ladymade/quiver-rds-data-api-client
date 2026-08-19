@@ -1,4 +1,5 @@
 import type React from "react";
+import { useTranslation } from "react-i18next";
 import type { ExecuteQueryData, ExecuteQueryValue } from "../../shared/types/ipc";
 import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
@@ -50,6 +51,7 @@ export function QueryResults({
   onPreviousPage,
   onNextPage,
 }: QueryResultsProps): React.JSX.Element {
+  const { t } = useTranslation();
   const records = result?.records ?? [];
   const columns = result?.columns ?? [];
   const numberOfRecordsUpdated = result?.numberOfRecordsUpdated;
@@ -83,29 +85,29 @@ export function QueryResults({
     <section
       data-testid="query-results"
       className="flex h-full min-h-0 flex-col overflow-hidden border-t border-[#bac9cc] bg-white"
-      aria-label="Query results"
+      aria-label={t("results.ariaLabel")}
     >
       <header className="sticky top-0 z-20 flex h-10 shrink-0 items-center justify-between border-b border-[#d7e3e6] bg-[#edf4f6] px-4">
         <div className="flex items-center gap-3">
-          <h3 className="stitch-label-md text-[#4f5d60]">Results</h3>
+          <h3 className="stitch-label-md text-[#4f5d60]">{t("results.title")}</h3>
         </div>
         {hasQueryRows ? (
           <span data-testid="row-count" className="stitch-body-sm text-[#607276]">
-            {records.length} rows returned
+            {t("results.rowsReturned", { count: records.length })}
           </span>
         ) : null}
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden p-3">
         {isRunningQuery ? (
-          <p className="stitch-body-sm text-muted-foreground">Running query...</p>
+          <p className="stitch-body-sm text-muted-foreground">{t("results.running")}</p>
         ) : errorMessage != null ? (
           <p className="stitch-body-sm text-red-600">{errorMessage}</p>
         ) : result == null ? (
-          <p className="stitch-body-sm text-muted-foreground">Run Query to see results.</p>
+          <p className="stitch-body-sm text-muted-foreground">{t("results.empty")}</p>
         ) : hasDmlResult ? (
           <p data-testid="dml-result-message" className="stitch-body-sm text-muted-foreground">
-            Rows affected: {numberOfRecordsUpdated}
+            {t("results.rowsAffected", { count: numberOfRecordsUpdated })}
           </p>
         ) : hasTableData ? (
           <>
@@ -163,11 +165,11 @@ export function QueryResults({
                 variant="outline"
                 className="h-7 rounded border border-[#bac9cc] bg-white px-2 text-[11px]"
               >
-                Prev
+                {t("results.previous")}
               </Button>
               <span className="stitch-body-sm text-[#607276]">
                 <span data-testid="page-info">
-                  Page {currentPage} / {totalPages}
+                  {t("results.page", { current: currentPage, total: totalPages })}
                 </span>
               </span>
               <Button
@@ -178,12 +180,12 @@ export function QueryResults({
                 variant="outline"
                 className="h-7 rounded border border-[#bac9cc] bg-white px-2 text-[11px]"
               >
-                Next
+                {t("results.next")}
               </Button>
             </div>
           </>
         ) : (
-          <p className="stitch-body-sm text-muted-foreground">No rows returned.</p>
+          <p className="stitch-body-sm text-muted-foreground">{t("results.noRows")}</p>
         )}
       </div>
     </section>

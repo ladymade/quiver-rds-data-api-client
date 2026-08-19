@@ -7,6 +7,7 @@ import { registerConnectionProfileIpcHandlers } from "./interfaces/ipc/connectio
 import { registerCredentialsIpcHandlers } from "./interfaces/ipc/credentialsIpcHandler";
 import { registerErrorLogIpcHandlers } from "./interfaces/ipc/errorLogIpcHandler";
 import { registerRdsIpcHandlers } from "./interfaces/ipc/rdsIpcHandler";
+import { registerSettingsIpcHandlers } from "./interfaces/ipc/settingsIpcHandler";
 
 const isDev = process.env.NODE_ENV === "development";
 const rendererUrl = process.env.VITE_DEV_SERVER_URL?.trim() || "http://127.0.0.1:5173";
@@ -99,6 +100,7 @@ app.whenReady().then(() => {
   registerErrorLogIpcHandlers();
   registerRdsIpcHandlers();
   registerConnectionProfileIpcHandlers();
+  registerSettingsIpcHandlers();
   void createWindow();
 
   app.on("activate", () => {

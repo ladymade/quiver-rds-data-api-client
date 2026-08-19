@@ -1,6 +1,7 @@
 import { FolderOpen } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { AwsCredentialProfileDto, DbClusterDto } from "../../shared/types/ipc";
 import { AWS_REGIONS } from "../constants/awsRegions";
 import { useErrorDialog } from "../hooks/useErrorDialog";
@@ -35,6 +36,7 @@ export function NewProfileForm({
   onChange,
   initialValues,
 }: NewProfileFormProps): React.JSX.Element {
+  const { t } = useTranslation();
   const [credentialProfiles, setCredentialProfiles] = useState<AwsCredentialProfileDto[]>([]);
   const [isLoadingCredentials, setIsLoadingCredentials] = useState(true);
   const [profileName, setProfileName] = useState("");
@@ -73,7 +75,7 @@ export function NewProfileForm({
       }
 
       setIsLoadingCredentials(true);
-      const stopLoading = beginLoading("Loading AWS credentials...");
+      const stopLoading = beginLoading(t("form.loadingAwsCredentials"));
 
       try {
         const result =
@@ -94,14 +96,14 @@ export function NewProfileForm({
         });
       } catch (error) {
         setCredentialProfiles([]);
-        setCredentialLoadError("予期せぬエラーが発生しました。");
+        setCredentialLoadError(t("common.unexpectedError"));
         showUnexpectedError(error, "renderer:list-credential-profiles");
       } finally {
         stopLoading();
         setIsLoadingCredentials(false);
       }
     },
-    [beginLoading, showUnexpectedError]
+    [beginLoading, showUnexpectedError, t]
   );
 
   const handleSelectCredentialsDirectory = async (): Promise<void> => {
@@ -109,7 +111,7 @@ export function NewProfileForm({
       return;
     }
 
-    const stopLoading = beginLoading("Selecting credentials directory...");
+    const stopLoading = beginLoading(t("form.selectingCredentialsDirectory"));
 
     try {
       const selection = await window.quiverApi.selectAwsCredentialsDirectory();
@@ -193,7 +195,7 @@ export function NewProfileForm({
     }
 
     setIsLoadingClusters(true);
-    const stopLoading = beginLoading("Loading clusters...");
+    const stopLoading = beginLoading(t("form.loadingClusters"));
 
     try {
       const result = await window.quiverApi.listDbClusters({
@@ -204,7 +206,7 @@ export function NewProfileForm({
 
       if (result.error != null) {
         setDbClusters([]);
-        showErrorDialog("Execution Error", result.error.message, result.error.details);
+        showErrorDialog(t("common.executionError"), result.error.message, result.error.details);
         return;
       }
 
@@ -256,6 +258,7 @@ export function NewProfileForm({
     selectedClusterArn,
     showErrorDialog,
     showUnexpectedError,
+    t,
   ]);
 
   useEffect(() => {
@@ -294,9 +297,9 @@ export function NewProfileForm({
     <Card className="rounded-lg border border-[#bac9cc] bg-white shadow-sm">
       <CardContent className="space-y-6 p-8">
         <FormField
-          helperText="A unique name to identify this connection profile."
+          helperText={t("form.profileNameHint")}
           id="profile-name"
-          label="Profile Name"
+          label={t("form.profileName")}
         >
           <Input
             data-testid="profile-name-input"
@@ -313,7 +316,7 @@ export function NewProfileForm({
           <div>
             <div className="mb-2 flex min-h-6 items-center justify-between">
               <label className="stitch-label-md text-slate-900" htmlFor="aws-credentials">
-                AWS Credentials
+                {t("form.awsCredentials")}
               </label>
               <Button
                 data-testid="credentials-directory-button"
@@ -327,7 +330,7 @@ export function NewProfileForm({
                 variant="ghost"
               >
                 <FolderOpen aria-hidden="true" size={18} strokeWidth={2} />
-                Choose directory
+                {t("form.chooseDirectory")}
               </Button>
             </div>
 
@@ -340,10 +343,10 @@ export function NewProfileForm({
                 <SelectValue
                   placeholder={
                     isLoadingCredentials
-                      ? "Loading credentials..."
+                      ? t("form.loadingCredentials")
                       : credentialProfiles.length > 0
-                        ? "Choose credentials..."
-                        : "No AWS profiles found"
+                        ? t("form.chooseCredentials")
+                        : t("form.noAwsProfiles")
                   }
                 />
               </SelectTrigger>
@@ -363,7 +366,7 @@ export function NewProfileForm({
                 className="stitch-body-sm mt-1 truncate text-slate-500"
                 title={selectedCredentialsDirectory}
               >
-                Directory: {selectedCredentialsDirectory}
+                {t("form.directory", { path: selectedCredentialsDirectory })}
               </p>
             ) : null}
           </div>
@@ -371,7 +374,7 @@ export function NewProfileForm({
           <div>
             <div className="mb-2 flex min-h-6 items-center">
               <label className="stitch-label-md text-slate-900" htmlFor="aws-region">
-                AWS Region
+                {t("form.awsRegion")}
               </label>
             </div>
             <Select
@@ -385,7 +388,7 @@ export function NewProfileForm({
                 className="h-10 w-full rounded border-[#bac9cc] bg-white"
                 id="aws-region"
               >
-                <SelectValue placeholder="Choose region..." />
+                <SelectValue placeholder={t("form.chooseRegion")} />
               </SelectTrigger>
               <SelectContent>
                 {AWS_REGIONS.map((region) => (
@@ -398,9 +401,9 @@ export function NewProfileForm({
           </div>
         </div>
 
-        <FormField helperText="" id="database-instance" label="Database Instance / Cluster">
+        <FormField helperText="" id="database-instance" label={t("form.databaseCluster")}>
           <fieldset className="mb-4 space-y-2">
-            <legend className="sr-only">Cluster input mode</legend>
+            <legend className="sr-only">{t("form.clusterInputMode")}</legend>
             <label className="flex cursor-pointer items-start gap-3 rounded border border-[#bac9cc] p-3 transition-colors hover:bg-slate-50">
               <input
                 data-testid="cluster-select-radio"
@@ -413,10 +416,10 @@ export function NewProfileForm({
               />
               <span className="space-y-0.5">
                 <span className="stitch-body-md block font-medium text-slate-900">
-                  Select from available clusters
+                  {t("form.selectCluster")}
                 </span>
                 <span className="stitch-body-sm block text-slate-600">
-                  Choose a Data API-enabled Aurora cluster from your AWS account.
+                  {t("form.selectClusterDescription")}
                 </span>
               </span>
             </label>
@@ -432,10 +435,10 @@ export function NewProfileForm({
               />
               <span className="space-y-0.5">
                 <span className="stitch-body-md block font-medium text-slate-900">
-                  Enter Cluster ARN directly
+                  {t("form.enterClusterArn")}
                 </span>
                 <span className="stitch-body-sm block text-slate-600">
-                  Paste the Aurora cluster ARN when you already know the target cluster.
+                  {t("form.enterClusterArnDescription")}
                 </span>
               </span>
             </label>
@@ -444,14 +447,14 @@ export function NewProfileForm({
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <p className="stitch-body-sm text-muted-foreground">
               {clusterInputMode === "direct-arn"
-                ? "Enter the full ARN for the Aurora cluster you want to use."
+                ? t("form.enterFullArn")
                 : selectedCredentialName.length === 0 || selectedRegion.length === 0
-                  ? "Select AWS credentials and a region to load available clusters."
+                  ? t("form.selectCredentialsAndRegion")
                   : isLoadingClusters
-                    ? "Loading clusters..."
+                    ? t("form.loadingClusters")
                     : dbClusters.length > 0
-                      ? "Select a cluster from the list below."
-                      : "No Data API-enabled Aurora clusters were found for this selection."}
+                      ? t("form.selectClusterHint")
+                      : t("form.noClustersFound")}
             </p>
           </div>
 
@@ -480,10 +483,10 @@ export function NewProfileForm({
                   <SelectValue
                     placeholder={
                       isLoadingClusters
-                        ? "Loading clusters..."
+                        ? t("form.loadingClusters")
                         : dbClusters.length > 0
-                          ? "Select a cluster..."
-                          : "No clusters available"
+                          ? t("form.selectClusterPlaceholder")
+                          : t("form.noClustersAvailable")
                     }
                   />
                 </SelectTrigger>
@@ -510,7 +513,7 @@ export function NewProfileForm({
                 variant="outline"
                 className="h-10 w-10 rounded border-[#bac9cc] bg-white"
               >
-                <span className="sr-only">Refresh clusters</span>
+                <span className="sr-only">{t("form.refreshClusters")}</span>
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
@@ -541,7 +544,9 @@ export function NewProfileForm({
         <Separator className="bg-[#bac9cc]" />
 
         <fieldset className="space-y-2">
-          <legend className="stitch-label-md text-slate-700">Authentication Method</legend>
+          <legend className="stitch-label-md text-slate-700">
+            {t("form.authenticationMethod")}
+          </legend>
           <label className="flex cursor-pointer items-start gap-3 rounded border border-border p-3 transition-colors hover:bg-slate-50">
             <input
               defaultChecked
@@ -552,16 +557,16 @@ export function NewProfileForm({
             />
             <span className="space-y-0.5">
               <span className="stitch-body-md block font-medium text-slate-900">
-                AWS Secrets Manager
+                {t("form.secretsManager")}
               </span>
               <span className="stitch-body-sm block text-slate-600">
-                Recommended for automated and secure credential retrieval.
+                {t("form.secretsManagerDescription")}
               </span>
             </span>
           </label>
         </fieldset>
 
-        <FormField helperText="" id="secrets-manager-arn" label="Secrets Manager ARN" mono>
+        <FormField helperText="" id="secrets-manager-arn" label={t("form.secretsManagerArn")} mono>
           <Input
             data-testid="secrets-arn-input"
             className="h-10 rounded border-[#bac9cc] bg-white font-mono text-[13px]"
@@ -571,7 +576,7 @@ export function NewProfileForm({
           />
         </FormField>
 
-        <FormField helperText="" id="database-name" label="Database / Schema Name">
+        <FormField helperText="" id="database-name" label={t("form.databaseName")}>
           <Input
             data-testid="database-name-input"
             className="h-10 rounded border-[#bac9cc] bg-white font-mono text-[13px]"

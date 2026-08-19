@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import type React from "react";
+import { useTranslation } from "react-i18next";
 
 type AppTopbarProps = {
   pageTitle: string;
@@ -40,6 +41,7 @@ export function AppTopbar({
   onPrimaryAction,
   onTestConnection,
 }: AppTopbarProps): React.JSX.Element {
+  const { t } = useTranslation();
   const shouldShowActions = showProfileActions;
 
   return (
@@ -83,7 +85,7 @@ export function AppTopbar({
                   className="h-9 rounded border border-[#bac9cc] bg-white px-4 text-[12px] font-semibold text-[#151d1e] hover:bg-[#e8eff1]"
                   type="button"
                 >
-                  {isTestingConnection ? "Testing..." : "Test Connection"}
+                  {isTestingConnection ? t("profile.testing") : t("profile.testConnection")}
                 </Button>
                 {showDeleteAction ? (
                   <Button
@@ -95,7 +97,7 @@ export function AppTopbar({
                     className="h-9 rounded border border-[#ba1a1a] bg-white px-4 text-[12px] font-semibold text-[#ba1a1a] hover:bg-red-50 hover:text-[#ba1a1a]"
                     type="button"
                   >
-                    Delete Profile
+                    {t("profile.delete")}
                   </Button>
                 ) : null}
                 <Button

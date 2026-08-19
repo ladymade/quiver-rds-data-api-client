@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
 import type React from "react";
+import { useTranslation } from "react-i18next";
 
 type ConfirmDialogProps = {
   open: boolean;
@@ -19,11 +20,12 @@ export function ConfirmDialog({
   title,
   message,
   confirmLabel,
-  cancelLabel = "Cancel",
+  cancelLabel,
   isConfirming = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps): React.JSX.Element {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={(nextOpen) => !nextOpen && onCancel()}>
       <DialogContent
@@ -51,7 +53,7 @@ export function ConfirmDialog({
             className="h-8 rounded border border-[#bac9cc] bg-white px-4 py-2 text-[12px] font-medium"
             disabled={isConfirming}
           >
-            {cancelLabel}
+            {cancelLabel ?? t("common.cancel")}
           </Button>
           <Button
             data-testid="dialog-confirm-button"
@@ -60,7 +62,7 @@ export function ConfirmDialog({
             className="h-8 rounded bg-[#ba1a1a] px-4 py-2 text-[12px] font-medium tracking-[0.05em] text-white hover:bg-[#a31313]"
             disabled={isConfirming}
           >
-            {isConfirming ? "Deleting..." : confirmLabel}
+            {isConfirming ? t("common.deleting") : confirmLabel}
           </Button>
         </div>
       </DialogContent>
