@@ -352,6 +352,7 @@ type QueryEditorTableListProps = {
   databaseName: string;
   tableEntries: QueryEditorTableEntry[];
   isLoadingTables: boolean;
+  onRefreshSchema: () => void;
   onToggleTable: (tableName: string) => void;
 };
 
@@ -383,6 +384,7 @@ function QueryEditorTableList({
   databaseName,
   tableEntries,
   isLoadingTables,
+  onRefreshSchema,
   onToggleTable,
 }: QueryEditorTableListProps): React.JSX.Element {
   const { t } = useTranslation();
@@ -396,6 +398,8 @@ function QueryEditorTableList({
           className="rounded p-1 text-[#607276] transition-colors hover:bg-white hover:text-[#006875]"
           type="button"
           aria-label={t("query.refreshSchemaExplorer")}
+          disabled={isLoadingTables}
+          onClick={onRefreshSchema}
         >
           <RefreshCw aria-hidden="true" size={14} strokeWidth={2} />
         </button>
@@ -671,6 +675,50 @@ export function QueryEditorPage({
     }
   };
 
+  const refreshSchemaExplorer = useCallback(async (): Promise<void> => {
+    if (!window.quiverApi || selectedProfile == null) {
+      setTableEntries([]);
+      setIsLoadingTables(false);
+      return;
+    }
+
+    setIsLoadingTables(true);
+    setTableEntries([]);
+    tableColumnRequestMapRef.current.clear();
+    const stopLoading = beginLoading(t("query.loadingTables"));
+
+    try {
+      const result = await window.quiverApi.listTables({
+        profileName: selectedProfile.credentialProfileName,
+        region: selectedProfile.region,
+        credentialsDirectory: selectedProfile.credentialsDirectory ?? undefined,
+        resourceArn: selectedProfile.clusterArn,
+        secretArn: selectedProfile.secretArn,
+        database: selectedProfile.database,
+        engine: selectedProfile.engine,
+      });
+
+      if (result.error != null) {
+        showErrorDialog(t("common.executionError"), result.error.message, result.error.details);
+        return;
+      }
+
+      setTableEntries(
+        result.tables.map((tableName) => ({
+          name: tableName,
+          columns: [],
+          isOpen: false,
+          isLoadingColumns: false,
+        }))
+      );
+    } catch (error) {
+      showUnexpectedError(error, "renderer:list-tables");
+    } finally {
+      stopLoading();
+      setIsLoadingTables(false);
+    }
+  }, [beginLoading, selectedProfile, showErrorDialog, showUnexpectedError, t]);
+
   const handleToggleTable = async (tableName: string): Promise<void> => {
     if (!window.quiverApi || selectedProfile == null) {
       return;
@@ -769,46 +817,8 @@ export function QueryEditorPage({
   };
 
   useEffect(() => {
-    if (!window.quiverApi || selectedProfile == null) {
-      setTableEntries([]);
-      setIsLoadingTables(false);
-      return;
-    }
-
-    setIsLoadingTables(true);
-    const stopLoading = beginLoading(t("query.loadingTables"));
-
-    void window.quiverApi
-      .listTables({
-        profileName: selectedProfile.credentialProfileName,
-        region: selectedProfile.region,
-        credentialsDirectory: selectedProfile.credentialsDirectory ?? undefined,
-        resourceArn: selectedProfile.clusterArn,
-        secretArn: selectedProfile.secretArn,
-        database: selectedProfile.database,
-        engine: selectedProfile.engine,
-      })
-      .then((result) => {
-        if (result.error != null) {
-          setTableEntries([]);
-          showErrorDialog(t("common.executionError"), result.error.message, result.error.details);
-          return;
-        }
-
-        setTableEntries(
-          result.tables.map((tableName) => ({
-            name: tableName,
-            columns: [],
-            isOpen: false,
-            isLoadingColumns: false,
-          }))
-        );
-      })
-      .finally(() => {
-        stopLoading();
-        setIsLoadingTables(false);
-      });
-  }, [beginLoading, selectedProfile, showErrorDialog, t]);
+    void refreshSchemaExplorer();
+  }, [refreshSchemaExplorer]);
 
   useEffect(() => {
     if (selectedProfileName.trim().length === 0) {
@@ -987,6 +997,9 @@ export function QueryEditorPage({
             <QueryEditorTableList
               databaseName={selectedProfile?.database ?? t("query.noDatabase")}
               isLoadingTables={isLoadingTables}
+              onRefreshSchema={() => {
+                void refreshSchemaExplorer();
+              }}
               onToggleTable={(tableName) => {
                 void handleToggleTable(tableName);
               }}
