@@ -1,11 +1,21 @@
 {
   "name": "quiver",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Desktop DB client for Amazon RDS Aurora via RDS Data API",
   "desktopName": "Quiver",
   "main": "dist/main/index.js",
-  "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ladymade/quiver-rds-data-api-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ladymade/quiver-rds-data-api-client/issues"
+  },
+  "homepage": "https://github.com/ladymade/quiver-rds-data-api-client#readme",
+  "engines": {
+    "node": ">=20"
+  },
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm run dev:main\" \"npm run dev:preload\" \"npm run dev:renderer\" \"npm run dev:electron\"",

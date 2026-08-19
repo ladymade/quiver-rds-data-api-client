@@ -1,77 +1,165 @@
 # Quiver
 
-A faster way to work with Aurora databases without repeated login friction, SSH hopping, or direct DB exposure.
+Quiver is a desktop database client for Amazon Aurora built around the AWS RDS Data API. It lets developers reuse AWS profiles and saved connection profiles while inspecting schemas and running SQL without opening a direct database TCP connection from the application.
 
-Quiver is a desktop database client for Amazon Aurora built around the AWS RDS Data API. It helps you connect to Aurora MySQL and PostgreSQL through AWS-native authentication and keep your database access simple, repeatable, and safer.
+Quiver currently supports Aurora MySQL and Aurora PostgreSQL through AWS-native APIs.
 
-## Why this project exists
+## Features
 
-If you work with AWS-hosted databases, the usual flow is painful:
-
-- you keep switching between AWS profiles and regions
-- you waste time re-entering credentials or cluster details
-- you rely on browser-based tooling or ad-hoc scripts
-- you need to manage direct database access in environments where that is not ideal or even allowed
-
-Quiver reduces that friction.
-
-With Quiver, you can:
-
-- open a saved profile and get straight to work
-- avoid repeated login and credential entry across sessions
-- connect to Aurora through AWS-native APIs instead of opening direct DB sockets
-- keep secrets out of browser-layer code and UI state
-- work in a focused desktop workflow built for database tasks
-
-## What Quiver solves
-
-- no repeated manual login flow for every session
-- no need to expose a direct database endpoint in your daily workflow
-- reduced operational overhead when using AWS profiles and Aurora clusters
-- a consistent desktop workflow for connection setup, schema inspection, and query execution
-
-## Core features
-
-- AWS profile discovery and selection
-- AWS credentials directory support
-- Aurora cluster lookup and connection testing
-- saved connection profile create / update / delete
-- table and column metadata inspection
-- SQL execution via the RDS Data API
-- desktop-based profile switching and query workflow
+- Discover and select AWS credential profiles
+- Discover Aurora clusters and test connections with `SELECT 1`
+- Create, edit, and delete saved connection profiles
+- Inspect tables and columns through Schema Explorer
+- Run SQL through the Amazon RDS Data API and view tabular results
+- Configure the application language in Settings
+- Use English (`en`), Japanese (`ja`), or Simplified Chinese (`zh-CN`)
 
 ## Screens
 
 - Create Profile
 - Edit Profile
 - Query Editor
+- Settings
+- Info
 
-For implementation details and UI specs, see:
+Screen specifications are available in the [documentation](#documentation).
 
-- [docs/CREATE_PROFILE_SCREEN.md](docs/CREATE_PROFILE_SCREEN.md)
-- [docs/EDIT_PROFILE_SCREEN.md](docs/EDIT_PROFILE_SCREEN.md)
-- [docs/QUERY_EDITOR_SCREEN.md](docs/QUERY_EDITOR_SCREEN.md)
+## Requirements
 
-## How it works
+### For installed applications
 
-Quiver uses the AWS SDK and RDS Data API instead of opening a raw database connection. It is designed for cataloging AWS-safe database access in a desktop workflow while keeping the app logic cleanly separated.
+- Windows x64, macOS Intel/Apple Silicon, or Linux x64
+- An AWS account with access to the target Aurora cluster
+- An Aurora cluster with the RDS Data API enabled
+- A Secrets Manager secret used by the Data API
+- AWS credentials configured as a named profile or in the default AWS credentials location
 
-The app structure is intentionally layered:
+### For development
 
-- Main process: AWS SDK calls, local persistence, IPC handlers
-- Preload: safe bridge to the renderer process
-- Renderer: React-based desktop UI only
-- Shared: typed IPC contracts between processes
+- Node.js 20 LTS or later
+- npm
+- Docker and Docker Compose for MiniStack-based local validation
 
-## Tech stack
+## Installation
 
-- Electron
-- React + TypeScript
-- Vite
-- Tailwind CSS
-- AWS SDK v3
-- Biome
-- Docker Compose / MiniStack
+Download the latest release from [GitHub Releases](https://github.com/ladymade/quiver-rds-data-api-client/releases).
+
+| Platform | Artifact |
+| --- | --- |
+| Windows | `.exe` NSIS installer, x64 |
+| macOS | `.dmg`, x64 or arm64 |
+| Linux | `.AppImage`, x64 |
+
+On Linux, make the AppImage executable before launching it:
+
+```bash
+chmod +x Quiver-*.AppImage
+./Quiver-*.AppImage
+```
+
+Current installers are unsigned and automatic updates are not included. Your operating system may display a security warning. Verify that downloads come from the official GitHub Releases page before launching them.
+
+## First-time setup
+
+1. Configure AWS credentials using the AWS CLI or another supported AWS credential source. Quiver reads the default AWS credentials directory (`~/.aws`) and can also use a custom credentials directory from Create Profile.
+2. Confirm that the Aurora cluster has the RDS Data API enabled and that the selected AWS identity can access RDS Data API and Secrets Manager.
+3. Launch Quiver and open **Create Profile**.
+4. Select an AWS credential profile and region.
+5. Select an Aurora cluster or enter its cluster ARN, then provide the Secrets Manager secret ARN and database name.
+6. Select the database engine if it is not detected automatically.
+7. Use **Test Connection**, then save the profile.
+8. Open the saved profile in **Query Editor** to inspect the schema and run SQL.
+
+Quiver does not store or expose AWS secret values in the renderer UI. Keep the local AWS credentials directory protected by your operating system.
+
+## Development
+
+Install dependencies and start the Electron application with its main, preload, and renderer processes:
+
+```bash
+npm install
+npm run dev
+```
+
+Build the application and verify the expected artifacts:
+
+```bash
+npm run build
+npm run verify:dist
+```
+
+Run the quality checks used by the project:
+
+```bash
+npm run lint
+npm run format
+```
+
+## Local testing with MiniStack
+
+MiniStack provides a local substitute for the AWS services used by the E2E tests. Start and initialize it before running the MiniStack project:
+
+```bash
+npm run ministack:up
+npm run ministack:init
+npm run test:e2e:ministack
+npm run ministack:down
+```
+
+For a focused smoke test, use:
+
+```bash
+npm run test:e2e:smoke
+```
+
+Useful commands include `npm run ministack:logs`, `npm run ministack:reset`, `npm run test:e2e:headed`, and `npm run test:e2e:report`.
+
+## Packaging
+
+Electron Builder writes release artifacts to `release/`:
+
+```bash
+npm run package
+```
+
+Platform-specific commands are available when their build requirements are installed:
+
+```bash
+npm run package:linux
+npm run package:mac
+npm run package:win
+```
+
+The Windows packaging command also checks for the required Windows build environment. Cross-platform packaging is limited by platform signing and native build requirements; run the command on the target platform when possible.
+
+## Architecture
+
+Quiver follows a clean-layer architecture:
+
+- **Main process**: AWS SDK calls, local persistence, and IPC handlers
+- **Preload**: the secure `contextBridge` between Electron processes
+- **Renderer**: React UI only; it does not access Node.js APIs directly
+- **Shared**: typed IPC contracts used by main and renderer
+- **Infrastructure**: AWS and storage implementations behind domain interfaces
+
+AWS SDK usage stays in the infrastructure layer, and the renderer does not receive AWS credentials or secret values.
+
+## Limitations
+
+- Only Aurora MySQL and Aurora PostgreSQL through the RDS Data API are supported.
+- Quiver does not open direct database TCP connections.
+- Automatic updates are not implemented.
+- Release installers are currently unsigned.
+- Query history, AWS SSO improvements, and richer schema visualization remain future work.
+
+## Troubleshooting
+
+- **No AWS profiles appear**: verify the credentials file exists under `~/.aws`, or select the correct custom credentials directory in Create Profile.
+- **No clusters appear**: confirm the selected region, AWS profile permissions, and that the cluster is Aurora with the RDS Data API enabled.
+- **Connection test fails**: verify the cluster ARN, secret ARN, database name, engine, and permissions for both RDS Data API and Secrets Manager.
+- **The AppImage does not launch**: confirm it is executable with `chmod +x` and check whether the Linux desktop environment reports a missing runtime dependency.
+
+When reporting a problem, never include AWS access keys, secret values, tokens, or production credentials.
 
 ## Project structure
 
@@ -89,172 +177,34 @@ quiver/
 │   ├── shared/
 │   └── ...
 ├── docs/
-│   ├── PROJECT_OVERVIEW.md
-│   ├── CREATE_PROFILE_SCREEN.md
-│   ├── EDIT_PROFILE_SCREEN.md
-│   └── QUERY_EDITOR_SCREEN.md
 ├── docker/
+├── e2e/
 ├── scripts/
 ├── build/
-├── e2e/
-├── package.json
 ├── electron-builder.yml
-├── tsconfig.json
-├── vite.config.ts
-├── biome.json
-├── LICENSE
-├── README.md
-├── CONTRIBUTING.md
-├── SECURITY.md
-└── .gitignore
+├── package.json
+└── README.md
 ```
 
-## Requirements
+## Documentation
 
-- Node.js 20 LTS or later
-- npm
-- AWS account with access to Aurora and RDS Data API
-- valid AWS credentials or named AWS profiles
-
-## Installation
-
-Download the latest installer from the [GitHub Releases](https://github.com/ladymade/quiver-rds-data-api-client/releases) page.
-
-- Windows: download the `.exe` installer
-- macOS: download the `.dmg` installer
-- Linux: download the `.AppImage` and make it executable before launching
-
-The v0.1.0 release is an early release. Installers are currently unsigned, and automatic updates are not included. Your operating system may show a security warning when launching an installer; verify the download source before continuing.
-
-## Getting started
-
-### 1) Install dependencies
-
-```bash
-npm install
-```
-
-### 2) Start the app in development mode
-
-```bash
-npm run dev
-```
-
-### 3) Build the project
-
-```bash
-npm run build
-```
-
-### 4) Run lint checks
-
-```bash
-npm run lint
-```
-
-## Useful commands
-
-```bash
-npm run dev
-npm run build
-npm run lint
-npm run lint:fix
-npm run format
-npm run package
-npm run package:linux
-npm run package:mac
-npm run package:win
-npm run ministack:up
-npm run ministack:init
-npm run ministack:down
-npm run ministack:logs
-npm run ministack:reset
-```
-
-## Local testing with MiniStack
-
-For local development and validation, the project supports MiniStack as a substitute for AWS RDS Data API endpoints.
-
-```bash
-npm run ministack:up
-npm run ministack:init
-```
-
-When the profile name is `ministack`, the app will use the local MiniStack endpoint instead of the AWS production endpoint.
-
-## Packaging installers
-
-The project is configured for Electron Builder packaging:
-
-```bash
-npm run build
-npm run package
-```
-
-Platform-specific packaging:
-
-```bash
-npm run package:linux
-npm run package:mac
-npm run package:win
-```
-
-Outputs are generated under the `release` directory.
-
-## Important constraints
-
-- no direct database TCP connection is used
-- AWS credentials and secrets are never exposed to the renderer process
-- AWS SDK usage is isolated to the infrastructure layer
-- IPC is typed and kept explicit between main and renderer
-- the app is designed for desktop use, not browser-only operation
-
-## Why this is useful for daily AWS work
-
-This app is meant to reduce repetitive AWS database work:
-
-- reuse a saved connection profile instead of re-entering cluster information every time
-- stop constantly switching between AWS tools and ad hoc SQL shells
-- keep AWS authentication centralized and profile-based
-- make quick Aurora checks part of a normal developer workflow
-
-## Roadmap
-
-Planned improvements include:
-
-- query history and re-execution
-- richer schema visualization
-- better error guidance for failed connections
-- stronger AWS profile / SSO support
-- improved logging and troubleshooting tools
+- [Project overview](docs/PROJECT_OVERVIEW.md)
+- [Create Profile](docs/CREATE_PROFILE_SCREEN.md)
+- [Edit Profile](docs/EDIT_PROFILE_SCREEN.md)
+- [Query Editor](docs/QUERY_EDITOR_SCREEN.md)
+- [Settings](docs/SETTINGS_SCREEN.md)
+- [Release guide](docs/RELEASING.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
 
 ## Contributing
 
-Contributions are welcome.
-
-Changes to `main` are managed through pull requests. Direct pushes to `main` are
-not part of the intended OSS workflow once branch protection is enabled.
-
-Before submitting changes:
-
-- open or update an issue for significant work
-- keep the project architecture consistent with the clean-layer design
-- keep AWS/RDS logic inside the infrastructure layer
-- prefer small, reviewable pull requests
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Keep AWS and RDS logic in the infrastructure layer, use the shared IPC types, and avoid committing credentials or environment-specific files.
 
 ## Security
 
-Please do not commit credentials or secrets. For vulnerability reporting, see [SECURITY.md](SECURITY.md).
+Do not commit credentials or secrets. For vulnerability reports, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
-## Related docs
-
-- [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)
-- [docs/CREATE_PROFILE_SCREEN.md](docs/CREATE_PROFILE_SCREEN.md)
-- [docs/EDIT_PROFILE_SCREEN.md](docs/EDIT_PROFILE_SCREEN.md)
-- [docs/QUERY_EDITOR_SCREEN.md](docs/QUERY_EDITOR_SCREEN.md)
+Quiver is licensed under the MIT License. See [LICENSE](LICENSE) for details.
