@@ -17,8 +17,8 @@
 
 ### Language Selection
 
-- 言語選択のドロップダウン。現在は `English` (`en`) のみ選択可能。
-- 将来的に他言語を追加する場合は `AppLanguage` 型 (`src/shared/types/ipc.ts`) にリテラルを追加する。
+- 言語選択のドロップダウン。`English` (`en`)、`日本語` (`ja`)、`简体中文` (`zh-CN`) を選択できる。
+- 許可する言語は `AppLanguage` 型 (`src/shared/types/ipc.ts`) と Main 側の `SaveSettingsUseCase` で同一に管理する。
 
 ### Save Settings ボタン
 
@@ -28,11 +28,12 @@
 
 1. 画面表示時に `getSettings` で現在の設定を取得し、フォームに反映する。
 2. ユーザーが言語を変更する。
-3. `Save Settings` を押下すると `saveSettings` を呼び出し、成功時は完了、失敗時はエラーダイアログを表示する。
+3. `Save Settings` を押下すると `saveSettings` を呼び出す。成功時は UI 全体を選択した言語へ即時切り替え、失敗時は現在の表示言語を維持してエラーダイアログを表示する。
+4. Renderer 起動時は `getSettings` で保存済みの言語を取得してから i18n を初期化する。取得できない場合は英語で起動する。
 
 ## バリデーション / 更新時の挙動
 
-- `language` は `"en"` 以外を許可しない(Main 側の `SaveSettingsUseCase` でバリデーション)。
+- `language` は `"en"`、`"ja"`、`"zh-CN"` のみを許可する(Main 側の `SaveSettingsUseCase` でバリデーション)。
 
 ## IPC 連携
 
@@ -47,6 +48,8 @@
 ## 実装ファイル
 
 - [src/renderer/components/SettingsPage.tsx](../src/renderer/components/SettingsPage.tsx)
+- [src/renderer/i18n.ts](../src/renderer/i18n.ts)
+- [src/renderer/locales/](../src/renderer/locales/)
 - [src/renderer/components/AppSidebar.tsx](../src/renderer/components/AppSidebar.tsx)
 - [src/renderer/App.tsx](../src/renderer/App.tsx)
 - [src/main/interfaces/ipc/settingsIpcHandler.ts](../src/main/interfaces/ipc/settingsIpcHandler.ts)

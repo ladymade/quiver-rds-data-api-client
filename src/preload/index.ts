@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { IPC_CHANNELS } from "../shared/types/ipc";
+import { type AppLanguage, IPC_CHANNELS } from "../shared/types/ipc";
 
 contextBridge.exposeInMainWorld("quiverApi", {
   getAppVersion: () => ipcRenderer.invoke(IPC_CHANNELS.GET_APP_VERSION),
@@ -82,6 +82,6 @@ contextBridge.exposeInMainWorld("quiverApi", {
   deleteConnectionProfile: (name: string) =>
     ipcRenderer.invoke(IPC_CHANNELS.DELETE_CONNECTION_PROFILE, name),
   getSettings: () => ipcRenderer.invoke(IPC_CHANNELS.GET_SETTINGS),
-  saveSettings: (settings: { language: "en" }) =>
+  saveSettings: (settings: { language: AppLanguage }) =>
     ipcRenderer.invoke(IPC_CHANNELS.SAVE_SETTINGS, settings),
 });

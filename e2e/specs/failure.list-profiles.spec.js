@@ -6,5 +6,5 @@ test("broken profiles json shows unexpected error dialog", async ({ page, userDa
   await page.reload();
   await expect(page.getByTestId("error-dialog")).toBeVisible();
   await expect(page.getByText("Execution Error")).toBeVisible();
-  await expect(page.getByText("予期せぬエラーが発生しました。")).toBeVisible();
+  await expect(page.getByText("An unexpected error occurred.")).toBeVisible();
 });

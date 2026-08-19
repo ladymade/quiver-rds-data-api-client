@@ -19,7 +19,7 @@ export function LoadingOverlayProvider({
   children,
 }: LoadingOverlayProviderProps): React.JSX.Element {
   const [isVisible, setIsVisible] = useState(false);
-  const [message, setMessage] = useState("Loading...");
+  const [message, setMessage] = useState<string | undefined>(undefined);
   const pendingCountRef = useRef(0);
   const isVisibleRef = useRef(false);
   const visibleSinceRef = useRef(0);
@@ -45,7 +45,7 @@ export function LoadingOverlayProvider({
   }, [isVisible]);
 
   const beginLoading = useCallback(
-    (nextMessage = "Loading...") => {
+    (nextMessage?: string) => {
       let stopped = false;
 
       pendingCountRef.current += 1;

@@ -1,7 +1,6 @@
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { useErrorDialog } from "./useErrorDialog";
-
-const UNEXPECTED_ERROR_MESSAGE = "予期せぬエラーが発生しました。";
 
 function normalizeUnknownError(error: unknown): {
   message: string;
@@ -39,6 +38,7 @@ function normalizeUnknownError(error: unknown): {
 export function useUnexpectedErrorHandler(): {
   showUnexpectedError: (error: unknown, source: string) => void;
 } {
+  const { t } = useTranslation();
   const { showErrorDialog } = useErrorDialog();
 
   const showUnexpectedError = useCallback(
@@ -50,9 +50,9 @@ export function useUnexpectedErrorHandler(): {
         stack: normalized.stack,
         metadata: normalized.metadata,
       });
-      showErrorDialog("Execution Error", UNEXPECTED_ERROR_MESSAGE);
+      showErrorDialog(t("common.executionError"), t("common.unexpectedError"));
     },
-    [showErrorDialog]
+    [showErrorDialog, t]
   );
 
   return { showUnexpectedError };

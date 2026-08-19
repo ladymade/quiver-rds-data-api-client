@@ -1,6 +1,7 @@
 import { Code2, Info, Link2, MemoryStick } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useUnexpectedErrorHandler } from "../hooks/useUnexpectedErrorHandler";
 
 type InfoPageProps = Readonly<Record<string, never>>;
@@ -8,12 +9,13 @@ type InfoPageProps = Readonly<Record<string, never>>;
 const GITHUB_URL = "https://github.com/ladymade/quiver-rds-data-api-client";
 
 export function InfoPage(_props: InfoPageProps): React.JSX.Element {
-  const [version, setVersion] = useState("Loading...");
+  const { t } = useTranslation();
+  const [version, setVersion] = useState("");
   const { showUnexpectedError } = useUnexpectedErrorHandler();
 
   useEffect(() => {
     if (!window.quiverApi) {
-      setVersion("Unavailable");
+      setVersion(t("info.versionUnavailable"));
       return;
     }
 
@@ -21,10 +23,10 @@ export function InfoPage(_props: InfoPageProps): React.JSX.Element {
       .getAppVersion()
       .then(setVersion)
       .catch((error) => {
-        setVersion("Unavailable");
+        setVersion(t("info.versionUnavailable"));
         showUnexpectedError(error, "renderer:get-app-version");
       });
-  }, [showUnexpectedError]);
+  }, [showUnexpectedError, t]);
 
   return (
     <section className="mx-auto w-full max-w-5xl px-8 py-8" aria-labelledby="info-page-title">
@@ -34,39 +36,32 @@ export function InfoPage(_props: InfoPageProps): React.JSX.Element {
         </div>
         <div>
           <h1 className="text-2xl font-semibold leading-8 text-[#151d1e]" id="info-page-title">
-            About Quiver
+            {t("info.title")}
           </h1>
-          <p className="text-sm leading-5 text-[#3b494c]">
-            Application Information &amp; Environment Status
-          </p>
+          <p className="text-sm leading-5 text-[#3b494c]">{t("info.subtitle")}</p>
         </div>
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
         <section className="relative overflow-hidden rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-sm md:col-span-12">
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-[#006875]">
-            Mission
+            {t("info.mission")}
           </h2>
-          <p className="max-w-3xl text-base leading-6 text-[#151d1e]">
-            Quiver is a professional desktop database client optimized for RDS Data API, providing
-            high-productivity tools for querying and managing your cloud databases. Designed with
-            precision and velocity in mind, it bridges the gap between secure cloud infrastructure
-            and seamless developer workflows.
-          </p>
+          <p className="max-w-3xl text-base leading-6 text-[#151d1e]">{t("info.missionText")}</p>
         </section>
 
         <section className="rounded-xl border border-[#E2E8F0] bg-white px-6 py-3 shadow-sm md:col-span-8">
           <h2 className="mb-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#3b494c]">
             <MemoryStick aria-hidden="true" size={16} />
-            System Information
+            {t("info.systemInformation")}
           </h2>
           <div className="flex items-center justify-between py-2">
-            <span className="text-sm leading-5 text-[#3b494c]">Version</span>
+            <span className="text-sm leading-5 text-[#3b494c]">{t("info.version")}</span>
             <span
               className="font-mono text-[13px] leading-5 text-[#151d1e]"
               data-testid="app-version"
             >
-              {version}
+              {version || t("info.loadingVersion")}
             </span>
           </div>
         </section>
@@ -75,10 +70,10 @@ export function InfoPage(_props: InfoPageProps): React.JSX.Element {
           <div>
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#3b494c]">
               <Link2 aria-hidden="true" size={16} />
-              Resources
+              {t("info.resources")}
             </h2>
             <p className="mb-4 text-sm leading-5 text-[#3b494c]">
-              Access documentation, report issues, or contribute to the project repository.
+              {t("info.resourcesDescription")}
             </p>
           </div>
           <a
@@ -88,7 +83,7 @@ export function InfoPage(_props: InfoPageProps): React.JSX.Element {
             rel="noreferrer"
           >
             <Code2 aria-hidden="true" size={20} />
-            View on GitHub
+            {t("info.viewOnGitHub")}
           </a>
         </section>
       </div>

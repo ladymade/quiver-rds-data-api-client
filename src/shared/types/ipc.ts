@@ -189,8 +189,7 @@ export type DeleteConnectionProfileResult = {
   errorMessage?: string;
 };
 
-// Only "en" is supported today; extend this union when adding new languages.
-export type AppLanguage = "en";
+export type AppLanguage = "en" | "ja" | "zh-CN";
 
 export type SettingsDto = {
   language: AppLanguage;

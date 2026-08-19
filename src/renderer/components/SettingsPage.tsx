@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "../../shared/types/ipc";
 import { useErrorDialog } from "../hooks/useErrorDialog";
 import { useLoadingOverlay } from "../hooks/useLoadingOverlay";
@@ -11,6 +12,7 @@ type SettingsPageProps = Readonly<Record<string, never>>;
 export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
   const [language, setLanguage] = useState<AppLanguage>("en");
   const [isSaving, setIsSaving] = useState(false);
+  const { i18n, t } = useTranslation();
   const { showErrorDialog } = useErrorDialog();
   const { beginLoading } = useLoadingOverlay();
   const { showUnexpectedError } = useUnexpectedErrorHandler();
@@ -36,17 +38,20 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
     }
 
     setIsSaving(true);
-    const stopLoading = beginLoading("Saving settings...");
+    const stopLoading = beginLoading(t("settings.savingOverlay"));
 
     try {
       const result = await window.quiverApi.saveSettings({ language });
       if (!result.success) {
         showErrorDialog(
-          "Failed to save settings",
-          result.errorMessage ?? "An unknown error occurred.",
+          t("settings.saveFailed"),
+          result.errorMessage ?? t("settings.unknownError"),
           undefined
         );
+        return;
       }
+
+      await i18n.changeLanguage(language);
     } catch (error) {
       showUnexpectedError(error, "renderer:save-settings");
     } finally {
@@ -68,7 +73,7 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
           size="sm"
           type="button"
         >
-          {isSaving ? "Saving..." : "Save Settings"}
+          {isSaving ? t("settings.saving") : t("settings.save")}
         </Button>
       </header>
 
@@ -76,16 +81,14 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
         <div className="mx-auto max-w-3xl">
           <div className="mb-8">
             <h2 className="text-2xl font-semibold text-[#151d1e]" id="settings-page-title">
-              Settings
+              {t("settings.title")}
             </h2>
-            <p className="mt-1 text-sm text-[#3b494c]">
-              Manage your application preferences and configuration.
-            </p>
+            <p className="mt-1 text-sm text-[#3b494c]">{t("settings.description")}</p>
           </div>
 
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
             <h2 className="mb-6 border-b border-[#E2E8F0] pb-4 text-lg font-semibold text-[#151d1e]">
-              General Settings
+              {t("settings.general")}
             </h2>
 
             <div>
@@ -93,7 +96,7 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
                 className="mb-2 block text-xs font-semibold text-[#3b494c]"
                 htmlFor="language-select"
               >
-                Language Selection
+                {t("settings.language")}
               </label>
               <div className="relative w-64">
                 <select
@@ -104,12 +107,12 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
                   }}
                   value={language}
                 >
-                  <option value="en">English</option>
+                  <option value="en">{t("settings.english")}</option>
+                  <option value="ja">{t("settings.japanese")}</option>
+                  <option value="zh-CN">{t("settings.simplifiedChinese")}</option>
                 </select>
               </div>
-              <p className="mt-2 text-sm text-[#3b494c]">
-                Select the default language for the application interface.
-              </p>
+              <p className="mt-2 text-sm text-[#3b494c]">{t("settings.languageDescription")}</p>
             </div>
           </div>
         </div>

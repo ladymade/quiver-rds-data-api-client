@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertCircle } from "lucide-react";
 import type React from "react";
+import { useTranslation } from "react-i18next";
 
 type ErrorDialogProps = {
   title: string;
@@ -16,6 +17,7 @@ export function ErrorDialog({
   details: _details,
   onClose,
 }: ErrorDialogProps): React.JSX.Element {
+  const { t } = useTranslation();
   const normalizedMessage = message.trim();
 
   // Prefer patterns from AWS/RDS errors: "Error: X Message: ..."
@@ -57,7 +59,7 @@ export function ErrorDialog({
             type="button"
             className="h-8 rounded bg-[#ba1a1a] px-4 py-2 text-[12px] font-medium tracking-[0.05em] text-white hover:bg-[#a31313]"
           >
-            Close
+            {t("common.close")}
           </Button>
         </div>
       </DialogContent>

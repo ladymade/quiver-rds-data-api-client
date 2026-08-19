@@ -13,6 +13,7 @@ import {
 import type { IDisposable, editor as MonacoEditor } from "monaco-editor";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type {
   ConnectionProfileDto,
   ExecuteQueryData,
@@ -384,16 +385,17 @@ function QueryEditorTableList({
   isLoadingTables,
   onToggleTable,
 }: QueryEditorTableListProps): React.JSX.Element {
+  const { t } = useTranslation();
   const hasTables = tableEntries.length > 0;
 
   return (
-    <section className="flex h-full flex-col bg-[#f9fbff]" aria-label="Database tables">
+    <section className="flex h-full flex-col bg-[#f9fbff]" aria-label={t("query.databaseTables")}>
       <div className="flex items-center justify-between border-b border-[#d7e3e6] bg-[#edf4f6] px-2 py-1.5">
-        <p className="stitch-label-md text-[#4f5d60] uppercase">Schema Explorer</p>
+        <p className="stitch-label-md text-[#4f5d60] uppercase">{t("query.schemaExplorer")}</p>
         <button
           className="rounded p-1 text-[#607276] transition-colors hover:bg-white hover:text-[#006875]"
           type="button"
-          aria-label="Refresh schema explorer"
+          aria-label={t("query.refreshSchemaExplorer")}
         >
           <RefreshCw aria-hidden="true" size={14} strokeWidth={2} />
         </button>
@@ -410,13 +412,17 @@ function QueryEditorTableList({
             <div className="mt-1 flex items-center gap-1.5 rounded px-1 py-1 text-[#344043] hover:bg-[#eaf1f4]">
               <ChevronDown aria-hidden="true" size={14} className="text-slate-400" />
               <Table2 aria-hidden="true" size={14} className="text-[#006875]" />
-              <span>tables</span>
+              <span>{t("query.tables")}</span>
             </div>
 
             {isLoadingTables ? (
-              <p className="stitch-body-sm ml-5 mt-1 text-muted-foreground">Loading tables...</p>
+              <p className="stitch-body-sm ml-5 mt-1 text-muted-foreground">
+                {t("query.loadingTables")}
+              </p>
             ) : !hasTables ? (
-              <p className="stitch-body-sm ml-5 mt-1 text-muted-foreground">No tables</p>
+              <p className="stitch-body-sm ml-5 mt-1 text-muted-foreground">
+                {t("query.noTables")}
+              </p>
             ) : (
               <ul className="ml-3 border-l border-[#d7e3e6] pl-2">
                 {tableEntries.map((table) => (
@@ -444,12 +450,14 @@ function QueryEditorTableList({
                       <ul className="ml-5 py-1">
                         {table.isLoadingColumns ? (
                           <li className="stitch-body-sm text-muted-foreground">
-                            Loading columns...
+                            {t("query.loadingColumns")}
                           </li>
                         ) : table.errorMessage ? (
                           <li className="stitch-body-sm text-red-600">{table.errorMessage}</li>
                         ) : table.columns.length === 0 ? (
-                          <li className="stitch-body-sm text-muted-foreground">No columns</li>
+                          <li className="stitch-body-sm text-muted-foreground">
+                            {t("query.noColumns")}
+                          </li>
                         ) : (
                           table.columns.map((column) => (
                             <li
@@ -489,6 +497,7 @@ export function QueryEditorPage({
   onEditProfile,
   onSelectedProfileNameChange,
 }: QueryEditorPageProps): React.JSX.Element {
+  const { t } = useTranslation();
   const { showErrorDialog } = useErrorDialog();
   const { beginLoading } = useLoadingOverlay();
   const { showUnexpectedError } = useUnexpectedErrorHandler();
@@ -623,7 +632,7 @@ export function QueryEditorPage({
     }
 
     setIsRunningQuery(true);
-    const stopLoading = beginLoading("Running query...");
+    const stopLoading = beginLoading(t("query.runningOverlay"));
 
     try {
       const result = await window.quiverApi.executeQuery({
@@ -639,8 +648,8 @@ export function QueryEditorPage({
       if (!result.success) {
         setQueryResult(null);
         showErrorDialog(
-          "Execution Error",
-          result.error?.message ?? "Failed to execute query.",
+          t("common.executionError"),
+          result.error?.message ?? t("query.failedToExecute"),
           result.error?.details
         );
         return;
@@ -694,7 +703,7 @@ export function QueryEditorPage({
       )
     );
 
-    const stopLoading = beginLoading("Loading table columns...");
+    const stopLoading = beginLoading(t("query.loadingTableColumns"));
 
     try {
       const result = await window.quiverApi.listTableColumns({
@@ -710,8 +719,8 @@ export function QueryEditorPage({
 
       if (result.error != null) {
         showErrorDialog(
-          "Execution Error",
-          result.error?.message ?? "Failed to load columns.",
+          t("common.executionError"),
+          result.error?.message ?? t("query.failedToLoadColumns"),
           result.error?.details
         );
         setTableEntries((previousEntries) =>
@@ -720,7 +729,7 @@ export function QueryEditorPage({
               ? {
                   ...entry,
                   isLoadingColumns: false,
-                  errorMessage: result.error?.message ?? "Failed to load columns.",
+                  errorMessage: result.error?.message ?? t("query.failedToLoadColumns"),
                 }
               : entry
           )
@@ -749,7 +758,7 @@ export function QueryEditorPage({
             ? {
                 ...entry,
                 isLoadingColumns: false,
-                errorMessage: "予期せぬエラーが発生しました。",
+                errorMessage: t("common.unexpectedError"),
               }
             : entry
         )
@@ -767,7 +776,7 @@ export function QueryEditorPage({
     }
 
     setIsLoadingTables(true);
-    const stopLoading = beginLoading("Loading tables...");
+    const stopLoading = beginLoading(t("query.loadingTables"));
 
     void window.quiverApi
       .listTables({
@@ -782,7 +791,7 @@ export function QueryEditorPage({
       .then((result) => {
         if (result.error != null) {
           setTableEntries([]);
-          showErrorDialog("Execution Error", result.error.message, result.error.details);
+          showErrorDialog(t("common.executionError"), result.error.message, result.error.details);
           return;
         }
 
@@ -799,7 +808,7 @@ export function QueryEditorPage({
         stopLoading();
         setIsLoadingTables(false);
       });
-  }, [beginLoading, selectedProfile, showErrorDialog]);
+  }, [beginLoading, selectedProfile, showErrorDialog, t]);
 
   useEffect(() => {
     if (selectedProfileName.trim().length === 0) {
@@ -899,15 +908,13 @@ export function QueryEditorPage({
     return (
       <section
         className="flex h-screen min-h-[36rem] items-center justify-center"
-        aria-label="Query editor empty state"
+        aria-label={t("query.emptyState")}
       >
         <div className="flex flex-col items-center gap-3 rounded-lg border border-border bg-white/80 p-8 text-center">
-          <h2 className="text-sm font-semibold">No profiles yet</h2>
-          <p className="text-xs text-muted-foreground">
-            Create your first profile to start using Query Editor.
-          </p>
+          <h2 className="text-sm font-semibold">{t("query.noProfiles")}</h2>
+          <p className="text-xs text-muted-foreground">{t("query.noProfilesDescription")}</p>
           <Button onClick={onCreateProfile} size="sm" type="button">
-            Create Profile
+            {t("profile.create")}
           </Button>
         </div>
       </section>
@@ -917,7 +924,7 @@ export function QueryEditorPage({
   return (
     <section
       className="flex h-screen min-h-[36rem] w-full bg-[#f3fbfc]"
-      aria-label="Query editor layout"
+      aria-label={t("query.layout")}
     >
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-16 items-center justify-between border-b border-[#e2e8f0] bg-[#f3fbfc] px-8">
@@ -934,7 +941,7 @@ export function QueryEditorPage({
                 className="h-7 w-[220px] border-none bg-transparent px-1 text-[13px] shadow-none focus:ring-0"
                 id="query-editor-profile-select"
               >
-                <SelectValue placeholder="Select profile..." />
+                <SelectValue placeholder={t("query.selectProfile")} />
               </SelectTrigger>
               <SelectContent>
                 {profiles.map((profile) => (
@@ -955,7 +962,7 @@ export function QueryEditorPage({
               variant="outline"
               className="h-9 rounded border border-[#bac9cc] bg-white px-4 text-[12px] font-semibold text-[#151d1e] hover:bg-[#e8eff1]"
             >
-              Edit Profile
+              {t("profile.edit")}
             </Button>
             <Button
               data-testid="run-query-button"
@@ -967,7 +974,7 @@ export function QueryEditorPage({
               type="button"
               className="h-9 rounded bg-[#006875] px-6 text-[12px] font-semibold text-white hover:bg-[#004f58]"
             >
-              {isRunningQuery ? "Running..." : "Run Query"}
+              {isRunningQuery ? t("query.running") : t("query.run")}
             </Button>
           </div>
         </header>
@@ -978,7 +985,7 @@ export function QueryEditorPage({
             style={{ width: `${tablePaneWidth}px` }}
           >
             <QueryEditorTableList
-              databaseName={selectedProfile?.database ?? "(no database)"}
+              databaseName={selectedProfile?.database ?? t("query.noDatabase")}
               isLoadingTables={isLoadingTables}
               onToggleTable={(tableName) => {
                 void handleToggleTable(tableName);
@@ -988,7 +995,7 @@ export function QueryEditorPage({
           </aside>
 
           <button
-            aria-label="Resize table list and editor panels"
+            aria-label={t("query.resizeTables")}
             type="button"
             onMouseDown={(event) => {
               tableDragStartXRef.current = event.clientX;
@@ -1018,7 +1025,7 @@ export function QueryEditorPage({
             </div>
 
             <button
-              aria-label="Resize editor and results panels"
+              aria-label={t("query.resizeResults")}
               type="button"
               onMouseDown={(event) => {
                 const currentEditorPane = event.currentTarget
