@@ -2,6 +2,21 @@
 
 All notable changes to Quiver are documented in this file.
 
+## [0.2.0] - 2026-08-19
+
+### Added
+
+- Settings screen with persisted language selection
+- English, Japanese, and Simplified Chinese UI translations
+- Info screen for application information
+- Schema Explorer refresh for tables and columns
+- Expanded desktop workflow for creating, editing, and deleting connection profiles
+
+### Changed
+
+- Updated public documentation with installation, first-time setup, development, testing, and packaging instructions
+- Added OSS repository metadata and a release checklist
+
 ## [0.1.0] - 2026-08-18
 
 ### Added
