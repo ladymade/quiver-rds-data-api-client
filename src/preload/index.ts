@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { IPC_CHANNELS } from "../shared/types/ipc";
 
 contextBridge.exposeInMainWorld("quiverApi", {
+  getAppVersion: () => ipcRenderer.invoke(IPC_CHANNELS.GET_APP_VERSION),
   listAwsCredentialProfiles: () => ipcRenderer.invoke(IPC_CHANNELS.LIST_AWS_CREDENTIAL_PROFILES),
   listAwsCredentialProfilesFromDirectory: (directoryPath: string) =>
     ipcRenderer.invoke(IPC_CHANNELS.LIST_AWS_CREDENTIAL_PROFILES_FROM_DIRECTORY, directoryPath),

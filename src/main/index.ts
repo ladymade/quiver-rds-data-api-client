@@ -2,6 +2,7 @@ import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { BrowserWindow, app } from "electron";
 import { AppErrorLogRepository } from "./infrastructure/storage/AppErrorLogRepository";
+import { registerAppInfoIpcHandlers } from "./interfaces/ipc/appInfoIpcHandler";
 import { registerConnectionProfileIpcHandlers } from "./interfaces/ipc/connectionProfileIpcHandler";
 import { registerCredentialsIpcHandlers } from "./interfaces/ipc/credentialsIpcHandler";
 import { registerErrorLogIpcHandlers } from "./interfaces/ipc/errorLogIpcHandler";
@@ -93,6 +94,7 @@ async function createWindow(): Promise<void> {
 }
 
 app.whenReady().then(() => {
+  registerAppInfoIpcHandlers();
   registerCredentialsIpcHandlers();
   registerErrorLogIpcHandlers();
   registerRdsIpcHandlers();
