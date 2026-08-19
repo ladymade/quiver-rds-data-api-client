@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import type React from "react";
 import { useEffect, useState } from "react";
 import type { AppLanguage } from "../../shared/types/ipc";
@@ -56,18 +57,19 @@ export function SettingsPage(_props: SettingsPageProps): React.JSX.Element {
 
   return (
     <section className="flex h-full flex-col" aria-labelledby="settings-page-title">
-      <header className="sticky top-0 z-20 flex h-16 w-full shrink-0 items-center justify-between border-b border-[#E2E8F0] bg-white px-8">
-        <div className="flex items-center gap-4" />
-        <button
-          className="rounded bg-[#006875] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#004f58] disabled:cursor-not-allowed disabled:opacity-60"
+      <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-[#E2E8F0] bg-[#f3fbfc] px-8">
+        <div aria-hidden="true" className="h-6 w-6" />
+        <Button
+          className="h-9 rounded bg-[#006875] px-6 text-[12px] font-semibold text-white hover:bg-[#004f58]"
           disabled={isSaving}
           onClick={() => {
             void handleSave();
           }}
+          size="sm"
           type="button"
         >
           {isSaving ? "Saving..." : "Save Settings"}
-        </button>
+        </Button>
       </header>
 
       <div className="flex-grow overflow-y-auto p-8">
