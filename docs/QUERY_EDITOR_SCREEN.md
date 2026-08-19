@@ -45,6 +45,7 @@ Query Editor は、選択中の接続プロファイルに対して SQL を実�
 - table 名
 - 対応する column の一覧
 - 開閉状態を持つ
+- Refresh Schema Explorer を実行すると、選択中の profile の table 一覧を再取得し、展開済みの column 情報をリセットする
 
 ## 画面フロー
 
