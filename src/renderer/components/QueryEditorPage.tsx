@@ -494,7 +494,7 @@ export function QueryEditorPage({
   const { showUnexpectedError } = useUnexpectedErrorHandler();
   const [tableEntries, setTableEntries] = useState<QueryEditorTableEntry[]>([]);
   const [isLoadingTables, setIsLoadingTables] = useState(false);
-  const [sql, setSql] = useState("SELECT *\nFROM your_table\nLIMIT 100;");
+  const [sql, setSql] = useState("");
   const [isRunningQuery, setIsRunningQuery] = useState(false);
   const [queryResult, setQueryResult] = useState<ExecuteQueryData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
