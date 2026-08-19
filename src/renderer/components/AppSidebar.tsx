@@ -1,17 +1,21 @@
-import { CircleHelp, Plus, Settings, TerminalSquare } from "lucide-react";
+import { Info, Plus, Settings, TerminalSquare } from "lucide-react";
 import type React from "react";
 import quiverIcon from "../assets/quiver-icon.ico";
 
 type AppSidebarProps = {
+  isInfoActive: boolean;
   isQueryEditorActive: boolean;
   isNewProfileActive: boolean;
+  onInfoClick: () => void;
   onQueryEditorClick: () => void;
   onNewProfileClick: () => void;
 };
 
 export function AppSidebar({
+  isInfoActive,
   isQueryEditorActive,
   isNewProfileActive,
+  onInfoClick,
   onQueryEditorClick,
   onNewProfileClick,
 }: AppSidebarProps): React.JSX.Element {
@@ -64,9 +68,20 @@ export function AppSidebar({
           <div className="flex h-10 w-full items-center justify-center text-[#E0E3FF]/60 transition-colors hover:bg-white/5 hover:text-[#E0E3FF]">
             <Settings aria-hidden="true" size={20} strokeWidth={2.1} />
           </div>
-          <div className="mt-1 flex h-10 w-full items-center justify-center text-[#E0E3FF]/60 transition-colors hover:bg-white/5 hover:text-[#E0E3FF]">
-            <CircleHelp aria-hidden="true" size={20} strokeWidth={2.1} />
-          </div>
+          <button
+            className={`${baseNavButtonClass} ${
+              isInfoActive
+                ? "border-[#9CF0FF] bg-[#006875]/20 text-[#9CF0FF] shadow-[0_0_15px_rgba(0,218,243,0.12)]"
+                : "border-transparent text-[#E0E3FF]/60 hover:bg-white/5 hover:text-[#E0E3FF]"
+            }`}
+            onClick={onInfoClick}
+            type="button"
+            aria-current={isInfoActive ? "page" : undefined}
+            aria-label="Info"
+            title="Info"
+          >
+            <Info aria-hidden="true" size={20} strokeWidth={2.1} />
+          </button>
         </div>
       </nav>
     </aside>

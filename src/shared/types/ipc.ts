@@ -2,6 +2,7 @@
 // All types here must be serializable (no class instances, no functions).
 
 export const IPC_CHANNELS = {
+  GET_APP_VERSION: "app:get-version",
   LIST_AWS_CREDENTIAL_PROFILES: "credentials:list-profiles",
   LIST_AWS_CREDENTIAL_PROFILES_FROM_DIRECTORY: "credentials:list-profiles-from-directory",
   SELECT_AWS_CREDENTIALS_DIRECTORY: "credentials:select-directory",
@@ -187,6 +188,7 @@ export type DeleteConnectionProfileResult = {
 };
 
 export type QuiverApi = {
+  getAppVersion: () => Promise<string>;
   listAwsCredentialProfiles: () => Promise<ListAwsCredentialProfilesResult>;
   listAwsCredentialProfilesFromDirectory: (
     directoryPath: string

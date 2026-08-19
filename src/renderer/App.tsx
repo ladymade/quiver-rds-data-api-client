@@ -5,6 +5,7 @@ import { AppSidebar } from "./components/AppSidebar";
 import { AppTopbar } from "./components/AppTopbar";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ErrorDialogProvider } from "./components/ErrorDialogProvider";
+import { InfoPage } from "./components/InfoPage";
 import { LoadingOverlayProvider } from "./components/LoadingOverlayProvider";
 import { NewProfileForm, type NewProfileFormValues } from "./components/NewProfileForm";
 import { QueryEditorPage } from "./components/QueryEditorPage";
@@ -12,7 +13,7 @@ import { useErrorDialog } from "./hooks/useErrorDialog";
 import { useLoadingOverlay } from "./hooks/useLoadingOverlay";
 import { useUnexpectedErrorHandler } from "./hooks/useUnexpectedErrorHandler";
 
-type AppView = "newProfile" | "queryEditor" | "editProfile";
+type AppView = "newProfile" | "queryEditor" | "editProfile" | "info";
 
 function AppContent(): React.JSX.Element {
   const { showErrorDialog } = useErrorDialog();
@@ -340,8 +341,12 @@ function AppContent(): React.JSX.Element {
   return (
     <div className="flex min-h-screen bg-[#f3fbfc]">
       <AppSidebar
+        isInfoActive={currentView === "info"}
         isQueryEditorActive={currentView === "queryEditor" || currentView === "editProfile"}
         isNewProfileActive={currentView === "newProfile"}
+        onInfoClick={() => {
+          setCurrentView("info");
+        }}
         onQueryEditorClick={() => {
           setCurrentView("queryEditor");
         }}
@@ -361,7 +366,7 @@ function AppContent(): React.JSX.Element {
         }}
       />
       <main className="ml-20 min-w-0 flex-1 bg-[#f3fbfc]">
-        {currentView !== "queryEditor" ? (
+        {currentView === "newProfile" || currentView === "editProfile" ? (
           <AppTopbar
             pageTitle={currentView === "newProfile" ? "New Profile" : "Edit Profile"}
             showProfileActions={currentView === "newProfile" || currentView === "editProfile"}
@@ -397,7 +402,9 @@ function AppContent(): React.JSX.Element {
             testConnectionSuccess={testConnectionSuccess}
           />
         ) : null}
-        {currentView === "newProfile" ? (
+        {currentView === "info" ? (
+          <InfoPage />
+        ) : currentView === "newProfile" ? (
           <section
             className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-8 py-8"
             aria-labelledby="page-title"
