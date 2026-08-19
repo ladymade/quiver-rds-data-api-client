@@ -81,4 +81,7 @@ contextBridge.exposeInMainWorld("quiverApi", {
   }) => ipcRenderer.invoke(IPC_CHANNELS.UPDATE_CONNECTION_PROFILE, params),
   deleteConnectionProfile: (name: string) =>
     ipcRenderer.invoke(IPC_CHANNELS.DELETE_CONNECTION_PROFILE, name),
+  getSettings: () => ipcRenderer.invoke(IPC_CHANNELS.GET_SETTINGS),
+  saveSettings: (settings: { language: "en" }) =>
+    ipcRenderer.invoke(IPC_CHANNELS.SAVE_SETTINGS, settings),
 });

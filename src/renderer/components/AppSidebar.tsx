@@ -6,18 +6,22 @@ type AppSidebarProps = {
   isInfoActive: boolean;
   isQueryEditorActive: boolean;
   isNewProfileActive: boolean;
+  isSettingsActive: boolean;
   onInfoClick: () => void;
   onQueryEditorClick: () => void;
   onNewProfileClick: () => void;
+  onSettingsClick: () => void;
 };
 
 export function AppSidebar({
   isInfoActive,
   isQueryEditorActive,
   isNewProfileActive,
+  isSettingsActive,
   onInfoClick,
   onQueryEditorClick,
   onNewProfileClick,
+  onSettingsClick,
 }: AppSidebarProps): React.JSX.Element {
   const baseNavButtonClass =
     "flex h-12 w-full items-center justify-center border-l-4 transition-all duration-200";
@@ -65,9 +69,20 @@ export function AppSidebar({
         </ul>
 
         <div className="mt-auto border-t border-[#1E293B] py-3">
-          <div className="flex h-10 w-full items-center justify-center text-[#E0E3FF]/60 transition-colors hover:bg-white/5 hover:text-[#E0E3FF]">
+          <button
+            className={`${baseNavButtonClass} ${
+              isSettingsActive
+                ? "border-[#9CF0FF] bg-[#006875]/20 text-[#9CF0FF] shadow-[0_0_15px_rgba(0,218,243,0.12)]"
+                : "border-transparent text-[#E0E3FF]/60 hover:bg-white/5 hover:text-[#E0E3FF]"
+            }`}
+            onClick={onSettingsClick}
+            type="button"
+            aria-current={isSettingsActive ? "page" : undefined}
+            aria-label="Settings"
+            title="Settings"
+          >
             <Settings aria-hidden="true" size={20} strokeWidth={2.1} />
-          </div>
+          </button>
           <button
             className={`${baseNavButtonClass} ${
               isInfoActive

@@ -9,7 +9,9 @@ type KnownFault =
   | "profiles:list:throw"
   | "profiles:create:throw"
   | "profiles:update:throw"
-  | "profiles:delete:throw";
+  | "profiles:delete:throw"
+  | "settings:get:throw"
+  | "settings:save:throw";
 
 function parseFaultSet(): Set<string> {
   const raw = process.env.QUVER_E2E_FAIL?.trim();

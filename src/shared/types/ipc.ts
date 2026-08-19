@@ -16,6 +16,8 @@ export const IPC_CHANNELS = {
   CREATE_CONNECTION_PROFILE: "profiles:create",
   UPDATE_CONNECTION_PROFILE: "profiles:update",
   DELETE_CONNECTION_PROFILE: "profiles:delete",
+  GET_SETTINGS: "settings:get",
+  SAVE_SETTINGS: "settings:save",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -187,6 +189,22 @@ export type DeleteConnectionProfileResult = {
   errorMessage?: string;
 };
 
+// Only "en" is supported today; extend this union when adding new languages.
+export type AppLanguage = "en";
+
+export type SettingsDto = {
+  language: AppLanguage;
+};
+
+export type GetSettingsResult = {
+  settings: SettingsDto;
+};
+
+export type SaveSettingsResult = {
+  success: boolean;
+  errorMessage?: string;
+};
+
 export type QuiverApi = {
   getAppVersion: () => Promise<string>;
   listAwsCredentialProfiles: () => Promise<ListAwsCredentialProfilesResult>;
@@ -209,4 +227,6 @@ export type QuiverApi = {
     profile: ConnectionProfileDto;
   }) => Promise<UpdateConnectionProfileResult>;
   deleteConnectionProfile: (name: string) => Promise<DeleteConnectionProfileResult>;
+  getSettings: () => Promise<GetSettingsResult>;
+  saveSettings: (settings: SettingsDto) => Promise<SaveSettingsResult>;
 };

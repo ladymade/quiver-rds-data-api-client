@@ -9,11 +9,12 @@ import { InfoPage } from "./components/InfoPage";
 import { LoadingOverlayProvider } from "./components/LoadingOverlayProvider";
 import { NewProfileForm, type NewProfileFormValues } from "./components/NewProfileForm";
 import { QueryEditorPage } from "./components/QueryEditorPage";
+import { SettingsPage } from "./components/SettingsPage";
 import { useErrorDialog } from "./hooks/useErrorDialog";
 import { useLoadingOverlay } from "./hooks/useLoadingOverlay";
 import { useUnexpectedErrorHandler } from "./hooks/useUnexpectedErrorHandler";
 
-type AppView = "newProfile" | "queryEditor" | "editProfile" | "info";
+type AppView = "newProfile" | "queryEditor" | "editProfile" | "info" | "settings";
 
 function AppContent(): React.JSX.Element {
   const { showErrorDialog } = useErrorDialog();
@@ -344,11 +345,15 @@ function AppContent(): React.JSX.Element {
         isInfoActive={currentView === "info"}
         isQueryEditorActive={currentView === "queryEditor" || currentView === "editProfile"}
         isNewProfileActive={currentView === "newProfile"}
+        isSettingsActive={currentView === "settings"}
         onInfoClick={() => {
           setCurrentView("info");
         }}
         onQueryEditorClick={() => {
           setCurrentView("queryEditor");
+        }}
+        onSettingsClick={() => {
+          setCurrentView("settings");
         }}
         onNewProfileClick={() => {
           setEditingProfileName(null);
@@ -404,6 +409,8 @@ function AppContent(): React.JSX.Element {
         ) : null}
         {currentView === "info" ? (
           <InfoPage />
+        ) : currentView === "settings" ? (
+          <SettingsPage />
         ) : currentView === "newProfile" ? (
           <section
             className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-8 py-8"
