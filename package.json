@@ -1,6 +1,6 @@
 {
   "name": "quiver",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Desktop DB client for Amazon RDS Aurora via RDS Data API",
   "desktopName": "Quiver",
   "main": "dist/main/index.js",

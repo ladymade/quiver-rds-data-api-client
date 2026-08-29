@@ -2,6 +2,22 @@
 
 All notable changes to Quiver are documented in this file.
 
+## [0.3.0] - 2026-08-30
+
+### Added
+
+- Keyboard shortcut for executing queries from the Query Editor
+- Screenshots to the public README
+
+### Changed
+
+- Translated the public screen documentation into English
+- Aligned the loading overlay with the application background
+
+### Fixed
+
+- Improved error handling for unreadable AWS credentials files
+
 ## [0.2.0] - 2026-08-19
 
 ### Added
