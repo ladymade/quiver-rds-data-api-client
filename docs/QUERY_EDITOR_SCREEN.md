@@ -1,82 +1,82 @@
 # Query Editor Screen
 
-## 目的
+## Purpose
 
-Query Editor は、選択中の接続プロファイルに対して SQL を実行し、結果とスキーマを確認できる画面です。
+Query Editor is the screen for running SQL against the selected connection profile and viewing results and schema information.
 
-この画面の主な用途は次のとおりです。
+The main uses of this screen are:
 
-- 接続プロファイルの切り替え
-- テーブル一覧の閲覧
-- カラム一覧の表示
-- SQL の入力と実行
-- 実行結果の表示
+- Switch connection profiles
+- Browse tables
+- View columns
+- Enter and run SQL
+- View query results
 
-## 画面の責務
+## Responsibilities
 
-- profile の選択
-- Schema Explorer の表示
-- table と column の取得
-- SQL エディタの表示
-- クエリ実行結果の表示
-- Create Profile / Edit Profile への遷移
+- Select a profile
+- Display Schema Explorer
+- Fetch tables and columns
+- Display the SQL editor
+- Display query results
+- Navigate to Create Profile / Edit Profile
 
-## ルーティング状態
+## Routing State
 
-この画面は `App` の `currentView === "queryEditor"` で表示されます。
+This screen is displayed when `currentView === "queryEditor"` in `App`.
 
-## 主要コンポーネント
+## Main Components
 
 ### QueryEditorPage
 
-- SQL エディタ
-- ビュー分割レイアウト
-- 実行結果表示
+- SQL editor
+- Split-view layout
+- Query result display
 - table explorer
 
 ### QueryResults
 
-- クエリの結果テーブルを表示する
-- 行数やページ切り替えを扱う
+- Displays the query result table
+- Handles row counts and pagination
 
 ### Schema Explorer
 
-- database 名
-- table 名
-- 対応する column の一覧
-- 開閉状態を持つ
-- Refresh Schema Explorer を実行すると、選択中の profile の table 一覧を再取得し、展開済みの column 情報をリセットする
+- Database name
+- Table name
+- List of matching columns
+- Expanded/collapsed state
+- Refresh Schema Explorer reloads the table list for the selected profile and resets expanded column information.
 
-## 画面フロー
+## Flow
 
-1. `listConnectionProfiles` で保存済みプロファイルを読み込む
-2. 初期の selected profile を決める
-3. SQL エディタを表示する
-4. table 一覧を取得して展開可能にする
-5. table を開くと column 一覧を取得する
-6. SQL を実行して query results を表示する
+1. Load saved profiles with `listConnectionProfiles`.
+2. Determine the initial selected profile.
+3. Display the SQL editor.
+4. Fetch the table list and make tables expandable.
+5. Fetch the column list when a table is expanded.
+6. Run SQL and display query results.
 
-## IPC 連携
+## IPC Integration
 
-### 取得系
+### Read Operations
 
 - `listConnectionProfiles`
 - `listTables`
 - `listTableColumns`
 
-### 実行系
+### Execute Operations
 
 - `executeQuery`
 
-## 実行時の挙動
+## Runtime Behavior
 
-- SQL を入力して `Run Query` を実行すると `executeQuery` が呼ばれる
-- 成功時は `ExecuteQueryData` をテーブルとして表示する
-- 失敗時は `ErrorDialog` を表示して詳細情報を出す
-- table / column の取得中はローディング表示を出す
-- 保存済み profile の `credentialsDirectory` にある `credentials` / `config` を読み取れない場合は、テーブル取得・カラム取得・クエリ実行で認証情報読み取りエラーを表示する
+- When SQL is entered and `Run Query` is executed, `executeQuery` is called.
+- On success, `ExecuteQueryData` is displayed as a table.
+- On failure, `ErrorDialog` is displayed with detailed information.
+- Loading indicators are shown while tables or columns are being fetched.
+- If the `credentials` / `config` files in the saved profile's `credentialsDirectory` cannot be read, table fetching, column fetching, and query execution display a credentials read error.
 
-## 実装ファイル
+## Implementation Files
 
 - [src/renderer/components/QueryEditorPage.tsx](../src/renderer/components/QueryEditorPage.tsx)
 - [src/renderer/components/QueryResults.tsx](../src/renderer/components/QueryResults.tsx)

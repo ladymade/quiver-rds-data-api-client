@@ -1,114 +1,114 @@
 # Create Profile Screen
 
-## 目的
+## Purpose
 
-Create Profile は、RDS Data API を利用するための接続プロファイルを新規作成する画面です。
+Create Profile is the screen for creating a new connection profile for the RDS Data API.
 
-この画面では、次の情報を収集します。
+This screen collects the following information:
 
-- AWS 認証プロファイル名
-- AWS リージョン
-- AWS credentials ディレクトリ
+- AWS credential profile name
+- AWS region
+- AWS credentials directory
 - Aurora cluster ARN
 - Secrets Manager secret ARN
-- データベース名
-- エンジン種別
+- Database name
+- Engine type
 
-## 画面の責務
+## Responsibilities
 
-- 新しい接続プロファイルの入力
-- AWS credential profile の選択
-- データベースの cluster 選択または ARN 手入力
-- 接続テストの実行
-- プロファイルの保存
+- Enter a new connection profile
+- Select an AWS credential profile
+- Select a database cluster or enter the ARN manually
+- Run a connection test
+- Save the profile
 
-## ルーティング状態
+## Routing State
 
-この画面は `App` の `currentView === "newProfile"` で表示されます。
+This screen is displayed when `currentView === "newProfile"` in `App`.
 
-## 主な入力項目
+## Main Inputs
 
 ### Profile Name
 
-- 任意のプロファイル識別名
-- ユーザーが管理しやすい名称を指定する
-- 既存の profile 名と重複してはいけない
+- A user-defined profile identifier
+- Should be a name that is easy for the user to manage
+- Must not duplicate an existing profile name
 
 ### AWS Credential Profile
 
-- AWS CLI の profile 名を選択する
-- `~/.aws` から候補が読み込まれる
-- `credentialsDirectory` を指定した場合はそのディレクトリを参照する
-- 指定したディレクトリの `credentials` / `config` を読み取れない場合は、認証情報を読み取れない旨をフォーム上に表示する
+- Select an AWS CLI profile name
+- Options are loaded from `~/.aws`
+- If `credentialsDirectory` is specified, that directory is used instead
+- If the `credentials` / `config` files in the specified directory cannot be read, the form displays a credentials read error
 
 ### AWS Region
 
-- RDS と Secrets Manager を利用するリージョン
-- 選択した AWS profile に対応するリージョンが自動補完されることがある
+- The region used for RDS and Secrets Manager
+- The region associated with the selected AWS profile may be filled in automatically
 
 ### Cluster ARN
 
-- Aurora cluster の ARN を選択または入力する
-- `listDbClusters` の結果から候補を選択できる
-- cluster が見つからない場合は手入力モードが使われる
+- Select or enter the Aurora cluster ARN
+- Options can be selected from the `listDbClusters` result
+- Manual entry is available when no cluster is found
 
 ### Secret ARN
 
-- Data API が利用する Secrets Manager からのシークレット ARN
-- DB 接続に必要な認証情報を管理する
+- The Secrets Manager secret ARN used by the Data API
+- Stores the credentials required for the database connection
 
 ### Database
 
-- 接続するデータベース名
-- MySQL / PostgreSQL どちらでも利用可能
+- The database name to connect to
+- Supports both MySQL and PostgreSQL
 
 ### Engine
 
-- `postgresql` または `mysql`
-- cluster から推定されるが、手入力でも保持可能
+- `postgresql` or `mysql`
+- Inferred from the cluster, but can also be preserved from manual input
 
-## 操作フロー
+## Flow
 
-1. AWS credentials を読み込む
-2. AWS profile と region を選択する
-3. cluster を選択または ARN を入力する
-4. secret ARN と database を入力する
-5. Test Connection を実行する
-6. 接続が成功したら Create Profile を実行する
+1. Load AWS credentials.
+2. Select an AWS profile and region.
+3. Select a cluster or enter an ARN.
+4. Enter the secret ARN and database name.
+5. Run Test Connection.
+6. Run Create Profile after the connection succeeds.
 
-## バリデーション
+## Validation
 
-Create Profile で有効な条件は、以下を満たすことです。
+Create Profile is enabled when all of the following conditions are met:
 
-- profile name が入力済み
-- credential profile が入力済み
-- region が入力済み
-- cluster ARN が入力済み
-- secret ARN が入力済み
-- database が入力済み
+- Profile name is entered
+- Credential profile is entered
+- Region is entered
+- Cluster ARN is entered
+- Secret ARN is entered
+- Database is entered
 
-## IPC 連携
+## IPC Integration
 
-### 読み込み
+### Read Operations
 
 - `listAwsCredentialProfiles`
 - `listAwsCredentialProfilesFromDirectory`
 - `listDbClusters`
 
-### 実行
+### Execute Operations
 
 - `testConnection`
 - `createConnectionProfile`
 
-## UI の想定
+## UI Behavior
 
-- 右側の query editor 画面へ遷移する前に profile を保存する
-- `Test Connection` の結果をメッセージで表示する
-- 保存時に成功・失敗メッセージを表示する
-- エラー時には `ErrorDialog` を利用する
-- 認証情報ファイルを参照できない場合は、AWS SDK の詳細エラーではなくユーザー向けの認証情報読み取りエラーを表示する
+- The profile must be saved before navigating to the query editor screen on the right.
+- The `Test Connection` result is displayed as a message.
+- Success or failure messages are displayed when saving.
+- `ErrorDialog` is used for errors.
+- If the credential files cannot be accessed, a user-facing credentials read error is displayed instead of the raw AWS SDK error.
 
-## 実装ファイル
+## Implementation Files
 
 - [src/renderer/components/NewProfileForm.tsx](../src/renderer/components/NewProfileForm.tsx)
 - [src/renderer/App.tsx](../src/renderer/App.tsx)
