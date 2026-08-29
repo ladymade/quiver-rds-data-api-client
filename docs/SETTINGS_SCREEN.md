@@ -1,51 +1,51 @@
 # Settings Screen
 
-## 目的
+## Purpose
 
-アプリケーション全体の設定を管理する画面。現在は言語設定のみを提供する。
+Settings is the screen for managing application-wide settings. Currently, it only provides language settings.
 
-## 画面の責務
+## Responsibilities
 
-- 現在の設定値の表示
-- 設定値の変更と保存
+- Display current settings
+- Change and save settings
 
-## ルーティング状態
+## Routing State
 
-この画面は `App` の `currentView === "settings"` で表示されます。グローバルメニュー(左サイドバー)の歯車アイコンから遷移します。
+This screen is displayed when `currentView === "settings"` in `App`. Users navigate to it from the gear icon in the global menu on the left sidebar.
 
-## 主な入力項目 / 主要コンポーネント
+## Main Inputs / Components
 
 ### Language Selection
 
-- 言語選択のドロップダウン。`English` (`en`)、`日本語` (`ja`)、`简体中文` (`zh-CN`) を選択できる。
-- 許可する言語は `AppLanguage` 型 (`src/shared/types/ipc.ts`) と Main 側の `SaveSettingsUseCase` で同一に管理する。
+- Language selection dropdown. Users can choose English (`en`), Japanese (`ja`), or Simplified Chinese (`zh-CN`).
+- Allowed languages are managed consistently by the `AppLanguage` type (`src/shared/types/ipc.ts`) and the main process `SaveSettingsUseCase`.
 
-### Save Settings ボタン
+### Save Settings Button
 
-- 現在のフォーム内容を保存する。保存中はボタンを無効化しラベルを `Saving...` に変更する。
+- Saves the current form values. While saving, the button is disabled and its label changes to `Saving...`.
 
-## 操作フロー
+## Flow
 
-1. 画面表示時に `getSettings` で現在の設定を取得し、フォームに反映する。
-2. ユーザーが言語を変更する。
-3. `Save Settings` を押下すると `saveSettings` を呼び出す。成功時は UI 全体を選択した言語へ即時切り替え、失敗時は現在の表示言語を維持してエラーダイアログを表示する。
-4. Renderer 起動時は `getSettings` で保存済みの言語を取得してから i18n を初期化する。取得できない場合は英語で起動する。
+1. When the screen is displayed, fetch the current settings with `getSettings` and apply them to the form.
+2. The user changes the language.
+3. Pressing `Save Settings` calls `saveSettings`. On success, the entire UI switches immediately to the selected language. On failure, the current display language is preserved and an error dialog is displayed.
+4. On renderer startup, fetch the saved language with `getSettings` before initializing i18n. If the settings cannot be fetched, the app starts in English.
 
-## バリデーション / 更新時の挙動
+## Validation / Update Behavior
 
-- `language` は `"en"`、`"ja"`、`"zh-CN"` のみを許可する(Main 側の `SaveSettingsUseCase` でバリデーション)。
+- `language` only allows `"en"`, `"ja"`, or `"zh-CN"` and is validated by the main process `SaveSettingsUseCase`.
 
-## IPC 連携
+## IPC Integration
 
-### 取得系
+### Read Operations
 
 - `settings:get`
 
-### 実行系
+### Execute Operations
 
 - `settings:save`
 
-## 実装ファイル
+## Implementation Files
 
 - [src/renderer/components/SettingsPage.tsx](../src/renderer/components/SettingsPage.tsx)
 - [src/renderer/i18n.ts](../src/renderer/i18n.ts)

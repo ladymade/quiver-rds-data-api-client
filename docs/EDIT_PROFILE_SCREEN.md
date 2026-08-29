@@ -1,56 +1,56 @@
 # Edit Profile Screen
 
-## 目的
+## Purpose
 
-Edit Profile は既存の接続プロファイルを更新する画面です。
+Edit Profile is the screen for updating an existing connection profile.
 
-既存プロファイルの一覧から1件を選択し、AWS credential、リージョン、cluster ARN、secret ARN、database、engine を修正して保存できます。
+Users can select an existing profile from the profile list, update the AWS credential, region, cluster ARN, secret ARN, database, and engine, then save the changes.
 
-## 画面の責務
+## Responsibilities
 
-- 既存 profile の読み込み
-- profile の変更入力
-- cluster の再解決
-- profile の更新
-- profile の削除
+- Load existing profiles
+- Edit profile values
+- Resolve the cluster again
+- Update the profile
+- Delete the profile
 
-## ルーティング状態
+## Routing State
 
-この画面は `App` の `currentView === "editProfile"` で表示されます。
+This screen is displayed when `currentView === "editProfile"` in `App`.
 
-## 画面フロー
+## Flow
 
-1. Query Editor から既存 profile を選択
-2. `Edit Profile` に遷移する
-3. 現在の値がフォームへ初期化される
-4. 値を修正する
-5. `Save Profile` を押す
-6. profile の更新と再読込を行う
+1. Select an existing profile from Query Editor.
+2. Navigate to `Edit Profile`.
+3. Initialize the form with the current values.
+4. Edit the values.
+5. Press `Save Profile`.
+6. Update the profile and reload the profile list.
 
-## 更新時の挙動
+## Update Behavior
 
-- 更新対象の profile 名は `previousName` として保持される
-- 新しい cluster ARN が現在の利用可能 cluster に存在するか確認する
-- cluster が見つからない場合はエラーとして扱う
-- 保存済みの `credentialsDirectory` にある `credentials` / `config` を読み取れない場合は、認証情報を読み取れない旨を表示する
-- 更新成功後、profile 一覧を再読み込みして Query Editor に戻る
+- The target profile name is stored as `previousName`.
+- The new cluster ARN is checked against the currently available clusters.
+- If the cluster cannot be found, it is treated as an error.
+- If the `credentials` / `config` files in the saved `credentialsDirectory` cannot be read, a credentials read error is displayed.
+- After a successful update, the profile list is reloaded and the app returns to Query Editor.
 
-## 削除操作
+## Delete Operation
 
-Edit Profile では削除ボタンを利用でき、確認ダイアログを表示してから `deleteConnectionProfile` を呼び出します。
+Edit Profile provides a delete button. After displaying a confirmation dialog, it calls `deleteConnectionProfile`.
 
-## IPC 連携
+## IPC Integration
 
 - `listConnectionProfiles`
 - `listDbClusters`
 - `updateConnectionProfile`
 - `deleteConnectionProfile`
 
-## エラー表示
+## Error Display
 
-- 認証情報ディレクトリを参照できない状態で cluster 取得や接続テストを実行した場合は、予期しないエラーではなく認証情報読み取りエラーを表示する
+- If cluster retrieval or connection testing is run while the credentials directory cannot be accessed, a credentials read error is displayed instead of an unexpected error.
 
-## 実装ファイル
+## Implementation Files
 
 - [src/renderer/App.tsx](../src/renderer/App.tsx)
 - [src/renderer/components/NewProfileForm.tsx](../src/renderer/components/NewProfileForm.tsx)
