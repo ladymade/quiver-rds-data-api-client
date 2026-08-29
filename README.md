@@ -24,6 +24,16 @@ Quiver currently supports Aurora MySQL and Aurora PostgreSQL through AWS-native 
 
 Screen specifications are available in the [documentation](#documentation).
 
+## Screenshots
+
+![Create Profile — select AWS profile, region, and Test Connection](assets/quiver_create_profile.png)
+
+*Create a connection profile by selecting AWS credentials, region, cluster details, and testing the connection before saving.*
+
+![Query Editor — SQL editor, Schema Explorer, and query results table](assets/quiver_query_editor.png)
+
+*Inspect tables and columns, run SQL through the RDS Data API, and review tabular results in one workspace.*
+
 ## Requirements
 
 ### For installed applications
