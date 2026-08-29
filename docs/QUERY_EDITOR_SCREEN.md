@@ -74,6 +74,7 @@ Query Editor は、選択中の接続プロファイルに対して SQL を実�
 - 成功時は `ExecuteQueryData` をテーブルとして表示する
 - 失敗時は `ErrorDialog` を表示して詳細情報を出す
 - table / column の取得中はローディング表示を出す
+- 保存済み profile の `credentialsDirectory` にある `credentials` / `config` を読み取れない場合は、テーブル取得・カラム取得・クエリ実行で認証情報読み取りエラーを表示する
 
 ## 実装ファイル
 

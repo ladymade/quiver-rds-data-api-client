@@ -2,6 +2,7 @@ import { dialog, ipcMain } from "electron";
 import { IPC_CHANNELS } from "../../../shared/types/ipc";
 import { ListAwsCredentialProfilesUseCase } from "../../application/usecases/ListAwsCredentialProfilesUseCase";
 import { AwsCredentialProfileRepository } from "../../infrastructure/aws/AwsCredentialProfileRepository";
+import { AWS_CREDENTIALS_NOT_READABLE_MESSAGE } from "../../infrastructure/aws/AwsCredentialsNotReadableError";
 import { throwIfFaultInjected } from "./e2eFaultInjection";
 
 export function registerCredentialsIpcHandlers(): void {
@@ -9,12 +10,20 @@ export function registerCredentialsIpcHandlers(): void {
   const useCase = new ListAwsCredentialProfilesUseCase(repository);
 
   ipcMain.handle(IPC_CHANNELS.LIST_AWS_CREDENTIAL_PROFILES, async () => {
-    throwIfFaultInjected(
-      "credentials:list:throw",
-      "Injected failure for listAwsCredentialProfiles."
-    );
-    const profiles = await useCase.execute();
-    return { profiles };
+    try {
+      throwIfFaultInjected(
+        "credentials:list:throw",
+        "Injected failure for listAwsCredentialProfiles."
+      );
+      const profiles = await useCase.execute();
+      return { profiles };
+    } catch (error) {
+      console.error("Failed to load AWS credential profiles", error);
+      return {
+        profiles: [],
+        errorMessage: AWS_CREDENTIALS_NOT_READABLE_MESSAGE,
+      };
+    }
   });
 
   ipcMain.handle(
@@ -32,8 +41,7 @@ export function registerCredentialsIpcHandlers(): void {
         return {
           profiles: [],
           sourceDirectory: directoryPath,
-          errorMessage:
-            "Could not load AWS credentials from the selected directory. Ensure both credentials and config files exist and are readable.",
+          errorMessage: AWS_CREDENTIALS_NOT_READABLE_MESSAGE,
         };
       }
     }
