@@ -54,7 +54,7 @@ This screen is displayed when `currentView === "queryEditor"` in `App`.
 3. Display the SQL editor.
 4. Fetch the table list and make tables expandable.
 5. Fetch the column list when a table is expanded.
-6. Run SQL and display query results.
+6. Run SQL with the `Run Query` button or the SQL editor keyboard shortcut and display query results.
 
 ## IPC Integration
 
@@ -71,6 +71,8 @@ This screen is displayed when `currentView === "queryEditor"` in `App`.
 ## Runtime Behavior
 
 - When SQL is entered and `Run Query` is executed, `executeQuery` is called.
+- While the SQL editor is focused, `Ctrl + Enter` on Windows/Linux or `Cmd + Enter` on macOS executes the query.
+- The keyboard shortcut uses the same profile selection, non-empty SQL, and in-progress guards as the `Run Query` button.
 - On success, `ExecuteQueryData` is displayed as a table.
 - On failure, `ErrorDialog` is displayed with detailed information.
 - Loading indicators are shown while tables or columns are being fetched.

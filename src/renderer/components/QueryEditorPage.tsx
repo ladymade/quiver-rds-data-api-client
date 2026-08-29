@@ -38,6 +38,7 @@ type QueryEditorPageProps = {
 type QueryEditorSqlEditorProps = {
   value: string;
   onChange: (value: string) => void;
+  onRunQuery: () => void;
   tableEntries: QueryEditorTableEntry[];
   ensureTableColumnsLoaded: (tableName: string) => Promise<TableColumnDto[]>;
 };
@@ -192,12 +193,18 @@ function buildSqlKeywordSuggestions(
 function QueryEditorSqlEditor({
   value,
   onChange,
+  onRunQuery,
   tableEntries,
   ensureTableColumnsLoaded,
 }: QueryEditorSqlEditorProps): React.JSX.Element {
   const completionProviderRef = useRef<IDisposable | null>(null);
+  const onRunQueryRef = useRef(onRunQuery);
   const tableEntriesRef = useRef(tableEntries);
   const ensureTableColumnsLoadedRef = useRef(ensureTableColumnsLoaded);
+
+  useEffect(() => {
+    onRunQueryRef.current = onRunQuery;
+  }, [onRunQuery]);
 
   useEffect(() => {
     tableEntriesRef.current = tableEntries;
@@ -223,9 +230,13 @@ function QueryEditorSqlEditor({
           value={value}
           onChange={(nextValue) => onChange(nextValue ?? "")}
           onMount={(
-            _editor: MonacoEditor.IStandaloneCodeEditor,
+            editor: MonacoEditor.IStandaloneCodeEditor,
             monaco: typeof import("monaco-editor")
           ) => {
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+              onRunQueryRef.current();
+            });
+
             completionProviderRef.current?.dispose();
             completionProviderRef.current = monaco.languages.registerCompletionItemProvider("sql", {
               triggerCharacters: [".", " "],
@@ -1032,6 +1043,9 @@ export function QueryEditorPage({
               <QueryEditorSqlEditor
                 value={sql}
                 onChange={setSql}
+                onRunQuery={() => {
+                  void handleRunQuery();
+                }}
                 tableEntries={tableEntries}
                 ensureTableColumnsLoaded={ensureTableColumnsLoaded}
               />
