@@ -2,6 +2,10 @@ import path from "node:path";
 import { loadSharedConfigFiles } from "@smithy/shared-ini-file-loader";
 import type { AwsCredentialProfile } from "../../domain/entities/AwsCredentialProfile";
 import type { AwsCredentialProfileRepository as AwsCredentialProfileRepositoryPort } from "../../domain/repositories/AwsCredentialProfileRepository";
+import {
+  assertAwsCredentialsDirectoryReadable,
+  toAwsCredentialsNotReadableError,
+} from "./AwsCredentialsNotReadableError";
 
 export class AwsCredentialProfileRepository implements AwsCredentialProfileRepositoryPort {
   async listProfiles(directoryPath?: string): Promise<AwsCredentialProfile[]> {
@@ -40,12 +44,8 @@ export class AwsCredentialProfileRepository implements AwsCredentialProfileRepos
           return left.name.localeCompare(right.name);
         });
     } catch (error) {
-      if (directoryPath != null) {
-        throw error;
-      }
-
       console.error("Failed to load AWS credential profiles", error);
-      return [];
+      throw toAwsCredentialsNotReadableError(error);
     }
   }
 
@@ -58,6 +58,8 @@ export class AwsCredentialProfileRepository implements AwsCredentialProfileRepos
     if (trimmedDirectoryPath.length === 0) {
       throw new Error("AWS credentials directory path is empty.");
     }
+
+    await assertAwsCredentialsDirectoryReadable(trimmedDirectoryPath);
 
     return loadSharedConfigFiles({
       filepath: path.join(trimmedDirectoryPath, "credentials"),

@@ -39,6 +39,7 @@ Create Profile は、RDS Data API を利用するための接続プロファイ�
 - AWS CLI の profile 名を選択する
 - `~/.aws` から候補が読み込まれる
 - `credentialsDirectory` を指定した場合はそのディレクトリを参照する
+- 指定したディレクトリの `credentials` / `config` を読み取れない場合は、認証情報を読み取れない旨をフォーム上に表示する
 
 ### AWS Region
 
@@ -105,6 +106,7 @@ Create Profile で有効な条件は、以下を満たすことです。
 - `Test Connection` の結果をメッセージで表示する
 - 保存時に成功・失敗メッセージを表示する
 - エラー時には `ErrorDialog` を利用する
+- 認証情報ファイルを参照できない場合は、AWS SDK の詳細エラーではなくユーザー向けの認証情報読み取りエラーを表示する
 
 ## 実装ファイル
 

@@ -3,8 +3,20 @@ import { IPC_CHANNELS } from "../../../shared/types/ipc";
 import { ExecuteQueryUseCase } from "../../application/usecases/ExecuteQueryUseCase";
 import { ListDbClustersUseCase } from "../../application/usecases/ListDbClustersUseCase";
 import { TestConnectionUseCase } from "../../application/usecases/TestConnectionUseCase";
+import {
+  AWS_CREDENTIALS_NOT_READABLE_MESSAGE,
+  isAwsCredentialsNotReadableError,
+} from "../../infrastructure/aws/AwsCredentialsNotReadableError";
 import { DbClusterRepository } from "../../infrastructure/aws/DbClusterRepository";
 import { throwIfFaultInjected } from "./e2eFaultInjection";
+
+function formatErrorMessage(error: unknown): string {
+  if (isAwsCredentialsNotReadableError(error)) {
+    return AWS_CREDENTIALS_NOT_READABLE_MESSAGE;
+  }
+
+  return formatErrorDetails(error);
+}
 
 function formatErrorDetails(error: unknown): string {
   if (error instanceof Error) {
@@ -76,11 +88,12 @@ export function registerRdsIpcHandlers(): void {
         const clusters = await listClustersUseCase.execute(params);
         return { clusters };
       } catch (error) {
+        const message = formatErrorMessage(error);
         const details = formatErrorDetails(error);
         return {
           clusters: [],
           error: {
-            message: details,
+            message,
             details,
           },
         };
@@ -110,11 +123,12 @@ export function registerRdsIpcHandlers(): void {
           message: "Connection successful.",
         };
       } catch (error) {
+        const message = formatErrorMessage(error);
         const details = formatErrorDetails(error);
 
         return {
           success: false,
-          message: details,
+          message,
           details,
         };
       }
@@ -139,11 +153,12 @@ export function registerRdsIpcHandlers(): void {
         const tables = await repository.listTables(params);
         return { tables };
       } catch (error) {
+        const message = formatErrorMessage(error);
         const details = formatErrorDetails(error);
         return {
           tables: [],
           error: {
-            message: details,
+            message,
             details,
           },
         };
@@ -174,11 +189,12 @@ export function registerRdsIpcHandlers(): void {
         const columns = await repository.listTableColumns(params);
         return { columns };
       } catch (error) {
+        const message = formatErrorMessage(error);
         const details = formatErrorDetails(error);
         return {
           columns: [],
           error: {
-            message: details,
+            message,
             details,
           },
         };
@@ -205,11 +221,12 @@ export function registerRdsIpcHandlers(): void {
         const data = await executeQueryUseCase.execute(params);
         return { success: true, data };
       } catch (error) {
+        const message = formatErrorMessage(error);
         const details = formatErrorDetails(error);
         return {
           success: false,
           error: {
-            message: details,
+            message,
             details,
           },
         };

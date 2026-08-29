@@ -13,7 +13,26 @@ async function seedBrokenProfilesJson(userDataDir) {
   await fs.writeFile(profilePath, "{broken-json", "utf-8");
 }
 
+async function seedProfileWithMissingCredentialsDirectory(userDataDir) {
+  const missingCredentialsDirectory = path.join(userDataDir, "missing-aws-credentials");
+  await seedProfiles(userDataDir, [
+    {
+      name: "missing-credentials-profile",
+      credentialProfileName: "default",
+      region: "ap-northeast-1",
+      credentialsDirectory: missingCredentialsDirectory,
+      clusterArn: "arn:aws:rds:ap-northeast-1:123456789012:cluster:missing-credentials",
+      secretArn: "arn:aws:secretsmanager:ap-northeast-1:123456789012:secret:missing-credentials",
+      database: "app",
+      engine: "postgresql",
+    },
+  ]);
+
+  return missingCredentialsDirectory;
+}
+
 module.exports = {
   seedProfiles,
   seedBrokenProfilesJson,
+  seedProfileWithMissingCredentialsDirectory,
 };

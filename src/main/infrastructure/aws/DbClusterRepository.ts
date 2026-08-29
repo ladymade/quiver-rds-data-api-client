@@ -9,6 +9,10 @@ import type {
   ExecuteQueryValue,
   TableColumn,
 } from "../../domain/repositories/DbClusterRepository";
+import {
+  assertAwsCredentialsDirectoryReadable,
+  toAwsCredentialsNotReadableError,
+} from "./AwsCredentialsNotReadableError";
 
 export class DbClusterRepository implements DbClusterRepositoryPort {
   private readonly supportedEngines = {
@@ -489,13 +493,24 @@ export class DbClusterRepository implements DbClusterRepositoryPort {
     credentialsDirectory?: string
   ): Promise<{ accessKeyId: string; secretAccessKey: string }> {
     if (credentialsDirectory != null && credentialsDirectory.trim().length > 0) {
-      return fromIni({
-        profile: profileName,
-        filepath: path.join(credentialsDirectory, "credentials"),
-        configFilepath: path.join(credentialsDirectory, "config"),
-      })();
+      const trimmedCredentialsDirectory = credentialsDirectory.trim();
+      await assertAwsCredentialsDirectoryReadable(trimmedCredentialsDirectory);
+
+      try {
+        return await fromIni({
+          profile: profileName,
+          filepath: path.join(trimmedCredentialsDirectory, "credentials"),
+          configFilepath: path.join(trimmedCredentialsDirectory, "config"),
+        })();
+      } catch (error) {
+        throw toAwsCredentialsNotReadableError(error);
+      }
     }
 
-    return fromIni({ profile: profileName })();
+    try {
+      return await fromIni({ profile: profileName })();
+    } catch (error) {
+      throw toAwsCredentialsNotReadableError(error);
+    }
   }
 }

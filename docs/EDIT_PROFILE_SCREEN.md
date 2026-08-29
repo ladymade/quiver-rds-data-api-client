@@ -32,6 +32,7 @@ Edit Profile は既存の接続プロファイルを更新する画面です。
 - 更新対象の profile 名は `previousName` として保持される
 - 新しい cluster ARN が現在の利用可能 cluster に存在するか確認する
 - cluster が見つからない場合はエラーとして扱う
+- 保存済みの `credentialsDirectory` にある `credentials` / `config` を読み取れない場合は、認証情報を読み取れない旨を表示する
 - 更新成功後、profile 一覧を再読み込みして Query Editor に戻る
 
 ## 削除操作
@@ -44,6 +45,10 @@ Edit Profile では削除ボタンを利用でき、確認ダイアログを表�
 - `listDbClusters`
 - `updateConnectionProfile`
 - `deleteConnectionProfile`
+
+## エラー表示
+
+- 認証情報ディレクトリを参照できない状態で cluster 取得や接続テストを実行した場合は、予期しないエラーではなく認証情報読み取りエラーを表示する
 
 ## 実装ファイル
 
