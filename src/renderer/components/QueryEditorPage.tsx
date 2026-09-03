@@ -832,6 +832,9 @@ export function QueryEditorPage({
   }, [refreshSchemaExplorer]);
 
   useEffect(() => {
+    setQueryResult(null);
+    setCurrentPage(1);
+
     if (selectedProfileName.trim().length === 0) {
       setEditorPaneHeight(null);
       setHasUserResizedPane(false);

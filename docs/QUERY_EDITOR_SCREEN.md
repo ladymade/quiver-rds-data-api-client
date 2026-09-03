@@ -71,6 +71,7 @@ This screen is displayed when `currentView === "queryEditor"` in `App`.
 ## Runtime Behavior
 
 - When SQL is entered and `Run Query` is executed, `executeQuery` is called.
+- When the selected profile changes, the query result display is cleared and returns to the default no-result state.
 - While the SQL editor is focused, `Ctrl + Enter` on Windows/Linux or `Cmd + Enter` on macOS executes the query.
 - The keyboard shortcut uses the same profile selection, non-empty SQL, and in-progress guards as the `Run Query` button.
 - On success, `ExecuteQueryData` is displayed as a table.
